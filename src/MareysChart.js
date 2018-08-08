@@ -1,6 +1,8 @@
 import CanvasRenderer from './CanvasRenderer';
 import InteractionModule from './InteractionModule';
 
+'user strict';
+
 class MareysChart {
 
     constructor(id, stations, options) {
@@ -8,6 +10,7 @@ class MareysChart {
         this.stations = stations;
         this.options = options;
         this.scale = 1;
+        this.translation = {x: 0, y: 0};
 
         // Bind interactions
         this.interactionModule = new InteractionModule(id, this);

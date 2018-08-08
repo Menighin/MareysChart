@@ -1,4 +1,5 @@
 import Hammer from 'hammerjs';
+import Utils from './Utils';
 
 class InteractionModule {
 
@@ -6,6 +7,7 @@ class InteractionModule {
         this.canvas = document.querySelector(`#${id}`);
         this.chart = chart;
         this.hammer = new Hammer(this.canvas);
+        this.drag = {};
         this._bindEvents();
     }
 
@@ -15,6 +17,7 @@ class InteractionModule {
         this.hammer.on('panstart',  (event) => {this.onDragStart(event)});
         this.hammer.on('panmove',   (event) => {this.onDrag(event)});
         this.hammer.on('panend',    (event) => {this.onDragEnd(event)});
+        
     }
 
     onMouseWheel(evt) {
@@ -22,19 +25,26 @@ class InteractionModule {
             this.chart.scale++;
         }
         else if (evt.wheelDelta < 0) {
-            this.chart.scale -= 0.1;
+            this.chart.scale -= 1;
         }
     }
 
-    onDragStart(evt) {
 
+    onDragStart(evt) {
+        this.drag.pointer = this.getPointer(evt.center);
+        this.drag.initialTranslation = Object.assign({}, this.chart.translation);
     }
 
     onDrag(evt) {
+        let pointer = this.getPointer(evt.center);
 
+        let diffX = pointer.x - this.drag.pointer.x;
+        let diffY = pointer.y - this.drag.pointer.y;
+
+        this.chart.translation = {x:this.drag.initialTranslation.x + diffX, y:this.drag.initialTranslation.y + diffY};
     }
 
-    onDragend(evt) {
+    onDragEnd(evt) {
 
     }
 
@@ -47,8 +57,8 @@ class InteractionModule {
     */
     getPointer(touch) {
         return {
-            x: touch.x - util.getAbsoluteLeft(this.canvas.frame.canvas),
-            y: touch.y - util.getAbsoluteTop(this.canvas.frame.canvas)
+            x: touch.x - Utils.getAbsoluteLeft(this.canvas),
+            y: touch.y - Utils.getAbsoluteTop(this.canvas)
         };
     }
 

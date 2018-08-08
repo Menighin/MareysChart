@@ -1,3 +1,5 @@
+'user strict';
+
 class CanvasRenderer {
 
     constructor(id, chart) {
@@ -14,11 +16,16 @@ class CanvasRenderer {
 
     _draw() {
         this.ctx.clearRect(0, 0, this.w, this.h);
+
+        this.ctx.save();
         this.ctx.scale(this.chart.scale, this.chart.scale);
-        this.chart.scale = 1;
+        this.ctx.translate(this.chart.translation.x, this.chart.translation.y);
+
+        // console.log(this.chart.scale);
 
         this.chart.draw();
 
+        this.ctx.restore();
         requestAnimationFrame(this._draw.bind(this));
     }
 
