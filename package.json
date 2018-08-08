@@ -1,0 +1,32 @@
+{
+  "name": "mareyschart",
+  "version": "1.0.0",
+  "description": "Marey's Chart Component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "build-dev": "webpack --config webpack.dev.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Menighin/MareysChart.git"
+  },
+  "author": "Joao Menighin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Menighin/MareysChart/issues"
+  },
+  "homepage": "https://github.com/Menighin/MareysChart#readme",
+  "dependencies": {
+    "emitter-component": "^1.1.1",
+    "hammerjs": "^2.0.8"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5",
+    "webpack-merge": "^4.1.4"
+  }
+}
