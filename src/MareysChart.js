@@ -1,5 +1,7 @@
 import CanvasRenderer from './CanvasRenderer';
 import InteractionModule from './InteractionModule';
+import Canvas from './Canvas';
+import View from './View';
 
 'user strict';
 
@@ -8,9 +10,17 @@ class MareysChart {
     constructor(id, stations, options) {
         this.container = id;
         this.stations = stations;
-        this.options = options;
-        this.scale = 1;
-        this.translation = {x: 0, y: 0};
+        this.options = {
+            interaction: {
+                zoomSpeed: 1
+            }
+        };
+
+        // Define canvas for this chart
+        this.canvas = new Canvas(id, this);
+
+        // Define the view
+        this.view = new View(id, this);
 
         // Bind interactions
         this.interactionModule = new InteractionModule(id, this);
@@ -27,13 +37,13 @@ class MareysChart {
     }
 
     _drawStations() {
-        let ctx = this.canvasRenderer.ctx;
+        let ctx = this.canvas.ctx;
 
         ctx.font = "12px Arial";
         ctx.lineWidth = 1;
         ctx.strokeStyle = '#aaa';
         
-        let heightNeeded = this.stations.length * this.minStationHeight;
+        let heightNeeded = this.stations.length * 30;
 
         let x = 5;
         let y = 15;
@@ -45,10 +55,10 @@ class MareysChart {
 
             ctx.beginPath();
             ctx.moveTo(textWidth + 15, y - 3);
-            ctx.lineTo(this.w, y - 3);
+            ctx.lineTo(this.canvas.w, y - 3);
             ctx.stroke();
 
-            y += this.minStationHeight;
+            y += 30;
         });
 
     }

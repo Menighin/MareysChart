@@ -4,7 +4,6 @@ class CanvasRenderer {
 
     constructor(id, chart) {
         this.canvas = document.querySelector(`#${id}`);
-        this.ctx = this.canvas.getContext('2d');
         this.w = this.canvas.clientWidth;
         this.h = this.canvas.clientHeight;
         this.chart = chart;
@@ -15,17 +14,19 @@ class CanvasRenderer {
     }
 
     _draw() {
-        this.ctx.clearRect(0, 0, this.w, this.h);
+        let ctx = this.chart.canvas.ctx;
 
-        this.ctx.save();
-        this.ctx.scale(this.chart.scale, this.chart.scale);
-        this.ctx.translate(this.chart.translation.x, this.chart.translation.y);
+        ctx.clearRect(0, 0, this.w, this.h);
+
+        ctx.save();
+        ctx.scale(this.chart.view.scale, this.chart.view.scale);
+        ctx.translate(this.chart.view.translation.x, this.chart.view.translation.y);
 
         // console.log(this.chart.scale);
 
         this.chart.draw();
 
-        this.ctx.restore();
+        ctx.restore();
         requestAnimationFrame(this._draw.bind(this));
     }
 
