@@ -3,19 +3,29 @@ import InteractionModule from './InteractionModule';
 import Canvas from './Canvas';
 import View from './View';
 import MareysAxis from './MareysAxis';
+import Prototypes from './Prototypes';
 
 'user strict';
 
 class MareysChart {
 
     constructor(id, stations, options) {
+
+        // Create the prototypes
+        Prototypes.bind();
+
         this.div = id;
         this.data = {
-            stations
+            stations: stations.sort((a, b) => a.dist - b.dist)
         };
+
         this.options = {
             interaction: {
                 zoomSpeed: 1
+            },
+            timeWindow: {
+                start: new Date(),
+                end: new Date().addDays(1)
             }
         };
 
