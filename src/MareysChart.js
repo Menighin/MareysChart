@@ -4,19 +4,21 @@ import Canvas from './Canvas';
 import View from './View';
 import MareysAxis from './MareysAxis';
 import Prototypes from './Prototypes';
+import MareysTrain from './MareysTrain';
 
 'user strict';
 
 class MareysChart {
 
-    constructor(id, stations, options) {
+    constructor(id, stations, trains, options) {
 
         // Create the prototypes
         Prototypes.bind();
 
         this.div = id;
         this.data = {
-            stations: stations.sort((a, b) => a.dist - b.dist)
+            stations: stations.sort((a, b) => a.dist - b.dist),
+            trains: MareysTrain.castToMareysTrains(this, trains)
         };
 
         this.options = {
@@ -49,37 +51,14 @@ class MareysChart {
     }
 
     draw() {
+        // Draw the axis
         this.axis.draw();
-    }
 
-    _drawStations() {
-        let ctx = this.canvas.ctx;
-
-        ctx.font = "12px Arial";
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = '#aaa';
-        
-        let heightNeeded = this.stations.length * 30;
-
-        let x = 5;
-        let y = 15;
-
-        this.stations.forEach(s => {
-            ctx.fillText(s.label, x, y);
-
-            let textWidth = ctx.measureText(s.label).width;
-
-            ctx.beginPath();
-            ctx.moveTo(textWidth + 15, y - 3);
-            ctx.lineTo(this.canvas.w, y - 3);
-            ctx.stroke();
-
-            y += 30;
+        // Draw the trains
+        this.data.trains.forEach(t => {
+            t.draw();
         });
-
-    }
-
-    
+    } 
 
 }
 

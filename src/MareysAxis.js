@@ -51,7 +51,6 @@ class MareysAxis {
      */
     _drawStations() {
         let ctx = this.chart.canvas.ctx;
-        let width = this.chart.canvas.w;
         let maxDist = this.stations.last().dist;
         var drawingArea = this._getGridDrawingArea();
         let yFactor = (drawingArea.y2 - drawingArea.y1) / maxDist;
@@ -83,8 +82,6 @@ class MareysAxis {
         let ctx = this.chart.canvas.ctx;
         let timeWindow = this.timeWindow;
         let totalMinutes = (timeWindow.end.getTime() - timeWindow.start.getTime()) / (1000 * 60);
-        let height = this.chart.canvas.h - X_AXIS_HEIGHT;
-        let width = this.chart.canvas.w;
         var drawingArea = this._getGridDrawingArea();
         let xFactor = (drawingArea.x2 - drawingArea.x1) / totalMinutes;
 
