@@ -26,6 +26,9 @@ class MareysTrain {
         return mareysTrains;
     }
 
+    /**
+     * Draws this train line
+     */
     draw() {
         let ctx = this.chart.canvas.ctx;
         let drawingArea = this.chart.axis._getGridDrawingArea();
@@ -38,17 +41,32 @@ class MareysTrain {
 
         ctx.lineWidth = 3;
         ctx.strokeStyle = 'tomato';
+        ctx.fillStyle = '#e5593f';
 
+        // Defining coordinates of points
+        let points = [];
+        this.schedule.forEach(s => {
+            points.push({x: drawingArea.x1 + xFactor * s.time.diffMinutesWith(timeWindow.start), y: drawingArea.y1 + yFactor * s.dist});
+        });
+
+        // Drawing line
         ctx.beginPath();
-        ctx.moveTo(drawingArea.x1 + xFactor * this.schedule[0].time.diffMinutesWith(timeWindow.start), drawingArea.y1 + yFactor * this.schedule[0].dist);
+        ctx.moveTo(points[0].x, points[0].y);
 
-        this.schedule.forEach((s, i) => {
+        points.forEach((p, i) => {
             if (i == 0) return;
 
-            ctx.lineTo(drawingArea.x1 + xFactor * s.time.diffMinutesWith(timeWindow.start), drawingArea.y1 + yFactor * s.dist);
+            ctx.lineTo(p.x, p.y);
         });
 
         ctx.stroke();
+
+        // Drawing dots
+        points.forEach((p, i) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+            ctx.fill();
+        });
 
     }
 
