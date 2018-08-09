@@ -1,10 +1,13 @@
 'user strict';
 
-const STATION_FONTS = "12px Lucida Console";
+const STATION_FONTS = '12px Lucida Console';
+const STROKE_COLOR = '#ccc';
+const STROKE_COLOR_HIGHLIGHT = '#aaa';
 const X_AXIS_HEIGHT = 60;
 const Y_AXIS_WIDTH_PAN = 20;
 const Y_AXIS_LEFT_MARGIN = 5;
 const Y_AXIS_TOP_MARGIN = 15;
+const X_AXIS_MARGIN_TOP = 15;
 
 class MareysAxis {
 
@@ -56,7 +59,7 @@ class MareysAxis {
 
         ctx.font = STATION_FONTS;
         ctx.lineWidth = 1;
-        ctx.strokeStyle = '#aaa';
+        ctx.strokeStyle = STROKE_COLOR;
 
         this.chart.data.stations.forEach(s => {
 
@@ -67,7 +70,7 @@ class MareysAxis {
 
             // Draw the horizontal lines for station
             ctx.beginPath();
-            ctx.moveTo(this.largestStation.width + Y_AXIS_WIDTH_PAN, y - 3);
+            ctx.moveTo(drawingArea.x1, y - 3);
             ctx.lineTo(drawingArea.x2, y - 3);
             ctx.stroke();
         });
@@ -79,21 +82,47 @@ class MareysAxis {
     _drawTime() {
         let ctx = this.chart.canvas.ctx;
         let timeWindow = this.timeWindow;
-        let totalMinutes = (timeWindow.end.getTime() - timeWindow.start.getTime()) / (1000 * 60) / 15;
+        let totalMinutes = (timeWindow.end.getTime() - timeWindow.start.getTime()) / (1000 * 60);
         let height = this.chart.canvas.h - X_AXIS_HEIGHT;
         let width = this.chart.canvas.w;
         var drawingArea = this._getGridDrawingArea();
         let xFactor = (drawingArea.x2 - drawingArea.x1) / totalMinutes;
 
+        let startDate = timeWindow.start;
+
+
+        ctx.font = STATION_FONTS;
+
         for (let i = 0; i <= totalMinutes; i++) {
             
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = STROKE_COLOR;
+
+            startDate = startDate.addMinutes(1);
+
             let x = this.largestStation.width + Y_AXIS_WIDTH_PAN + i * xFactor;
 
-            // Draw vertical lines
-            ctx.beginPath();
-            ctx.moveTo(x, height + Y_AXIS_TOP_MARGIN - 3)
-            ctx.lineTo(x, Y_AXIS_TOP_MARGIN - 3);
-            ctx.stroke();
+            if (i % 15 == 0) {
+
+                if (i % 60 == 0) {
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = STROKE_COLOR_HIGHLIGHT;
+                }
+
+                // Draw vertical lines
+                ctx.beginPath();
+                ctx.moveTo(x, drawingArea.y2)
+                ctx.lineTo(x, drawingArea.y1);
+                ctx.stroke();
+
+            }
+
+            // Draw labels
+            if (i > 0 && i % 60 == 0) {
+                let label = startDate.toMareysAxisString();
+                let labelWidth = ctx.measureText(label).width;
+                ctx.fillText(label, x - labelWidth / 2, drawingArea.y2 + X_AXIS_MARGIN_TOP);
+            }
 
         }
     }
@@ -109,6 +138,7 @@ class MareysAxis {
             x2: width
         }
     }
+
 }
 
 export default MareysAxis;
