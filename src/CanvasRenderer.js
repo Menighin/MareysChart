@@ -22,8 +22,6 @@ class CanvasRenderer {
         ctx.translate(this.chart.view.translation.x, this.chart.view.translation.y);
         ctx.scale(this.chart.view.scale, this.chart.view.scale);
 
-        // console.log(this.chart.scale);
-
         this.chart.draw();
 
         ctx.restore();

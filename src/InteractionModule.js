@@ -124,9 +124,6 @@ class InteractionModule {
 
         this.chart.canvas.DOMtoCanvas(pointer)
 
-        // let diff = Utils.diffPoints(this.chart.canvas.DOMtoCanvas(pointer), this.touch.canvasPointer);
-
-
         this.chart.view.translation = {x:this.drag.initialTranslation.x + diff.x, y:this.drag.initialTranslation.y + diff.y};
     }
 

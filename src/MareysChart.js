@@ -2,19 +2,25 @@ import CanvasRenderer from './CanvasRenderer';
 import InteractionModule from './InteractionModule';
 import Canvas from './Canvas';
 import View from './View';
+import MareysAxis from './MareysAxis';
 
 'user strict';
 
 class MareysChart {
 
     constructor(id, stations, options) {
-        this.container = id;
-        this.stations = stations;
+        this.div = id;
+        this.data = {
+            stations
+        };
         this.options = {
             interaction: {
                 zoomSpeed: 1
             }
         };
+
+        // Defining the axis
+        this.axis = new MareysAxis(id, this);
 
         // Define canvas for this chart
         this.canvas = new Canvas(id, this);
@@ -33,7 +39,7 @@ class MareysChart {
     }
 
     draw() {
-        this._drawStations();
+        this.axis.draw();
     }
 
     _drawStations() {
