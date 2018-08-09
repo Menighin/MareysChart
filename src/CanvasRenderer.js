@@ -19,8 +19,8 @@ class CanvasRenderer {
         ctx.clearRect(0, 0, this.w, this.h);
 
         ctx.save();
-        ctx.scale(this.chart.view.scale, this.chart.view.scale);
         ctx.translate(this.chart.view.translation.x, this.chart.view.translation.y);
+        ctx.scale(this.chart.view.scale, this.chart.view.scale);
 
         // console.log(this.chart.scale);
 

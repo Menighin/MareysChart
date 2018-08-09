@@ -28,8 +28,12 @@ class InteractionModule {
      * @private
      */
     onTouch(evt) {
-        if (evt.isFirst)
-            this.touch.pointer = this.getPointer(evt.center);
+        if (evt.isFirst) {
+            let pointer = this.getPointer(evt.center);
+            let canvasPointer = this.chart.canvas.DOMtoCanvas(pointer);
+            this.touch.pointer = pointer;
+            this.touch.canvasPointer = canvasPointer;
+        }
     }
 
     onMouseWheel(evt) {
@@ -82,6 +86,13 @@ class InteractionModule {
             scale = 10;
         }
 
+        let preScaleDragPointer = undefined;
+        if (this.drag !== undefined) {
+            if (this.drag.dragging === true) {
+                preScaleDragPointer = this.canvas.DOMtoCanvas(this.touch.pointer);
+            }
+        }
+
         let translation = this.chart.view.translation;
 
         let scaleFrac = scale / scaleOld;
@@ -90,6 +101,12 @@ class InteractionModule {
 
         this.chart.view.scale = scale;
         this.chart.view.translation = {x:tx, y:ty};
+
+        if (preScaleDragPointer != undefined) {
+            let postScaleDragPointer = this.canvas.canvasToDOM(preScaleDragPointer);
+            this.touch.pointer.x = postScaleDragPointer.x;
+            this.touch.pointer.y = postScaleDragPointer.y;
+        }
 
     }
 
@@ -100,10 +117,17 @@ class InteractionModule {
 
     onDrag(evt) {
         let pointer = this.getPointer(evt.center);
-        let diffX = pointer.x - this.touch.pointer.x;
-        let diffY = pointer.y - this.touch.pointer.y;
+        let diff =  {
+            x: pointer.x - this.touch.pointer.x,
+            y: pointer.y - this.touch.pointer.y
+        };
 
-        this.chart.view.translation = {x:this.drag.initialTranslation.x + diffX, y:this.drag.initialTranslation.y + diffY};
+        this.chart.canvas.DOMtoCanvas(pointer)
+
+        // let diff = Utils.diffPoints(this.chart.canvas.DOMtoCanvas(pointer), this.touch.canvasPointer);
+
+
+        this.chart.view.translation = {x:this.drag.initialTranslation.x + diff.x, y:this.drag.initialTranslation.y + diff.y};
     }
 
     onDragEnd(evt) {
