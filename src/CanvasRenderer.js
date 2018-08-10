@@ -7,6 +7,7 @@ class CanvasRenderer {
         this.w = this.canvas.clientWidth;
         this.h = this.canvas.clientHeight;
         this.chart = chart;
+        this.drawing = false;
     }
 
     initDrawing() {
@@ -14,18 +15,23 @@ class CanvasRenderer {
     }
 
     _draw() {
-        let ctx = this.chart.canvas.ctx;
+        if (!this.drawing) {
+            this.drawing = true;
 
-        ctx.clearRect(0, 0, this.w, this.h);
+            let ctx = this.chart.canvas.ctx;
 
-        ctx.save();
-        ctx.translate(this.chart.view.translation.x, this.chart.view.translation.y);
-        ctx.scale(this.chart.view.scale, this.chart.view.scale);
+            ctx.clearRect(0, 0, this.w, this.h);
 
-        this.chart.draw();
+            ctx.save();
+            ctx.translate(this.chart.view.translation.x, this.chart.view.translation.y);
+            ctx.scale(this.chart.view.scale, this.chart.view.scale);
 
-        ctx.restore();
-        requestAnimationFrame(this._draw.bind(this));
+            this.chart.draw();
+
+            ctx.restore();
+            this.drawing = false;
+            requestAnimationFrame(this._draw.bind(this));
+        }
     }
 
 }

@@ -55,9 +55,8 @@ class MareysChart {
         this.axis.draw();
 
         // Draw the trains
-        this.data.trains.forEach(t => {
-            t.draw();
-        });
+        MareysTrain.drawTrains(this, this.data.trains);
+
     } 
 
 }
