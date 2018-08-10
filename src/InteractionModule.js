@@ -9,6 +9,7 @@ class InteractionModule {
         this.hammer = new Hammer(this.div);
         this.drag = {};
         this.touch = {};
+        this.mousePos = {};
         this._bindEvents();
     }
 
@@ -40,8 +41,13 @@ class InteractionModule {
 
     onMouseMove(evt) {
         let pointer = this.getPointer({x:event.clientX, y:event.clientY});
+        let canvasPos = this.chart.canvas.DOMtoCanvas(pointer);
+        this.mousePos = {
+            client: pointer,
+            canvas: canvasPos
+        };
 
-        this.chart.handleMouseMove(pointer);
+        this.chart.handleMouseMove(this.mousePos);
     }
 
     onMouseWheel(evt) {

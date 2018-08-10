@@ -5,6 +5,7 @@ import View from './View';
 import MareysAxis from './MareysAxis';
 import Prototypes from './Prototypes';
 import MareysTrain from './MareysTrain';
+import SelectionModule from './SelectionModule';
 
 'user strict';
 
@@ -21,7 +22,9 @@ class MareysChart {
         this.data = {
             stations: stations.sort((a, b) => a.dist - b.dist),
             trains: MareysTrain.castToMareysTrains(this, trains),
-            trainsById: {}
+            trainsById: {},
+            hoverTrainId: undefined,
+            selectedTrainIds: undefined
         };
 
         this.data.trains.forEach(t => {
@@ -48,6 +51,9 @@ class MareysChart {
         // Define the view
         this.view = new View(id, this);
 
+        // Define selection module to handle selections
+        this.selectionModule = new SelectionModule(id, this);
+
         // Bind interactions
         this.interactionModule = new InteractionModule(id, this);
 
@@ -63,13 +69,17 @@ class MareysChart {
         this.axis.draw();
 
         // Draw the trains
-        MareysTrain.drawTrains(this, this.data.trains);
+        MareysTrain.drawTrains(this);
     } 
 
-    handleMouseMove() {
+    handleMouseMove(pointer) {
+        let hoveredTrains = this.selectionModule.getTrainsAt(pointer);
 
+        if (hoveredTrains.length > 0)
+            this.data.hoverTrainId = hoveredTrains.last().id;
+        else
+            this.data.hoverTrainId = undefined;
     }
-
 }
 
 export default MareysChart;

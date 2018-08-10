@@ -31,29 +31,40 @@ class MareysTrain {
 
     /**
      * Static method to draw all the lines and dots of trains
-     * @param {MareysChart} chart 
-     * @param {Array.<MareysTrain>} trains 
+     * @param {MareysChart} chart - The MareysChart instance
      */
-    static drawTrains(chart, trains) {
+    static drawTrains(chart) {
         let ctx = chart.canvas.ctx;
+        let trains = chart.data.trains;
+        let trainsById = chart.data.trainsById;
 
         // Drawing trains
-        // Drawing lines
+        // Drawing commom lines
         ctx.beginPath();
         ctx.lineWidth = 3;
-        ctx.strokeStyle = 'tomato';
+        ctx.strokeStyle = chart.data.hoverTrainId ? '#999' : 'tomato';
         trains.forEach(t => {
-            t._drawLine();
+            if (t.id != chart.data.hoverTrainId)
+                t._drawLine();
         });
         ctx.stroke();
 
+        // Drawing hover lines
+        if (chart.data.hoverTrainId) {
+            ctx.beginPath();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'tomato';
+            trainsById[chart.data.hoverTrainId]._drawLine();
+            ctx.stroke();
+        }
+
         // Drawing dots
-        ctx.beginPath();
-        ctx.fillStyle = '#e5593f';
-        trains.forEach(t => {
-            t._drawDot();
-        });
-        ctx.fill();
+        // ctx.beginPath();
+        // ctx.fillStyle = '#e5593f';
+        // trains.forEach(t => {
+        //     t._drawDot();
+        // });
+        // ctx.fill();
     }
 
     /**
@@ -115,8 +126,52 @@ class MareysTrain {
     }
 
 
-    intersectsWith(point) {
-        
+    _linePointNearestMouse(line, x, y) {
+        //
+        var lerp=function(a,b,x){ return(a+x*(b-a)); };
+        var dx=line.x2-line.x1;
+        var dy=line.y2-line.y1;
+        var t=((x-line.x1)*dx+(y-line.y1)*dy)/(dx*dx+dy*dy);
+        var lineX=lerp(line.x1, line.x2, t);
+        var lineY=lerp(line.y1, line.y2, t);
+        return({x:lineX,y:lineY});
+    };
+
+    /**
+     * Returns whether the giving pointer is intersecting with a train line or not
+     * @param {Object} pointer - The pointer object
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates
+     * @returns {Boolean} - If the train is intersecting with the pointer or not
+     */
+    intersectsWith(pointer) {
+        let points = this._getPointsToDraw();
+
+        if (points.length <= 1) return false;
+
+        for (let i = 0; i < points.length - 1; i++) {
+
+            let line = {
+                x1: points[i].x,
+                y1: points[i].y,
+                x2: points[i + 1].x,
+                y2: points[i + 1].y
+            };
+
+            if(pointer.canvas.x < line.x1 || pointer.canvas.x > line.x2) {
+                continue;
+            }
+
+            let linePoint = this._linePointNearestMouse(line, pointer.canvas.x, pointer.canvas.y);
+            var dx=pointer.canvas.x-linePoint.x;
+            var dy=pointer.canvas.y-linePoint.y;
+            var distance=Math.abs(Math.sqrt(dx*dx+dy*dy));
+
+            if (distance <= 5) return true;
+        }
+
+        return false;
+
     }
 
 }

@@ -19,7 +19,19 @@ let stations = [
     },
     {
         label: 'Station Delta',
-        dist: 70
+        dist: 55
+    },
+    {
+        label: 'Station Echo',
+        dist: 63
+    },
+    {
+        label: 'Station Foxtrot',
+        dist: 100
+    },
+    {
+        label: 'Station Golf',
+        dist: 120
     },
 ];
 
@@ -28,7 +40,7 @@ let end = new Date(start.getTime() + 1000 * 60 * 60 * 24);
 
 let trains = [];
 
-for (let i = 0; i < 1000; i++) {
+for (let i = 0; i < 40; i++) {
     let train = {
         id: `t${i}`,
         group: `g${i}`,
