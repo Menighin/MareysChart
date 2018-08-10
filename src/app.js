@@ -28,7 +28,7 @@ let end = new Date(start.getTime() + 1000 * 60 * 60 * 24);
 
 let trains = [];
 
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 500; i++) {
     let train = {
         id: `t${i}`,
         group: `g${i}`,

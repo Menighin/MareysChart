@@ -60,6 +60,7 @@ class MareysAxis {
         ctx.lineWidth = 1;
         ctx.strokeStyle = STROKE_COLOR;
 
+        ctx.beginPath();
         this.chart.data.stations.forEach(s => {
 
             let y = Y_AXIS_TOP_MARGIN + s.dist * yFactor;
@@ -68,11 +69,11 @@ class MareysAxis {
             ctx.fillText(s.label, Y_AXIS_LEFT_MARGIN, y);
 
             // Draw the horizontal lines for station
-            ctx.beginPath();
             ctx.moveTo(drawingArea.x1, y - 3);
             ctx.lineTo(drawingArea.x2, y - 3);
-            ctx.stroke();
         });
+
+        ctx.stroke();
     }
 
     /**
@@ -87,31 +88,34 @@ class MareysAxis {
 
         let startDate = timeWindow.start;
 
-
         ctx.font = STATION_FONTS;
 
+        let lines = [];
+        let highlightLines = [];
+
+        // Generating lines & drawing labels
         for (let i = 0; i <= totalMinutes; i++) {
-            
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = STROKE_COLOR;
 
             startDate = startDate.addMinutes(1);
 
             let x = this.largestStation.width + Y_AXIS_WIDTH_PAN + i * xFactor;
 
-            if (i % 15 == 0) {
+            if (i % 15 == 0 && i % 60 !== 0) {
+                lines.push({
+                    x1: x,
+                    y1: drawingArea.y2,
+                    x2: x,
+                    y2: drawingArea.y1
+                });
+            }
 
-                if (i % 60 == 0) {
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = STROKE_COLOR_HIGHLIGHT;
-                }
-
-                // Draw vertical lines
-                ctx.beginPath();
-                ctx.moveTo(x, drawingArea.y2)
-                ctx.lineTo(x, drawingArea.y1);
-                ctx.stroke();
-
+            if (i % 60 === 0) {
+                highlightLines.push({
+                    x1: x,
+                    y1: drawingArea.y2,
+                    x2: x,
+                    y2: drawingArea.y1
+                });
             }
 
             // Draw labels
@@ -120,8 +124,28 @@ class MareysAxis {
                 let labelWidth = ctx.measureText(label).width;
                 ctx.fillText(label, x - labelWidth / 2, drawingArea.y2 + X_AXIS_MARGIN_TOP);
             }
-
         }
+
+        // Drawing grid
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = STROKE_COLOR;
+        lines.forEach(l => {
+            ctx.moveTo(l.x1, l.y1);
+            ctx.lineTo(l.x2, l.y2);
+        });
+        ctx.stroke();
+
+        // Drawing highlithed grid
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = STROKE_COLOR_HIGHLIGHT;
+        highlightLines.forEach(l => {
+            ctx.moveTo(l.x1, l.y1);
+            ctx.lineTo(l.x2, l.y2);
+        });
+        ctx.stroke();
+
     }
 
     _getGridDrawingArea() {
