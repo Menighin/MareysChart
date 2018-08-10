@@ -13,7 +13,9 @@ class InteractionModule {
     }
 
     _bindEvents() {
-        this.div.addEventListener('mousewheel', (evt) => {this.onMouseWheel(evt)});
+
+        this.div.addEventListener('mousewheel', (event) => {this.onMouseWheel(event)});
+        this.div.addEventListener('mousemove',  (event) => {this.onMouseMove(event)});
 
         this.hammer.on('hammer.input', (event) => {this.onTouch(event)});
         this.hammer.on('panstart',     (event) => {this.onDragStart(event)});
@@ -36,9 +38,13 @@ class InteractionModule {
         }
     }
 
-    onMouseWheel(evt) {
-        let pointer = this.getPointer(this.div);
+    onMouseMove(evt) {
+        let pointer = this.getPointer({x:event.clientX, y:event.clientY});
 
+        this.chart.handleMouseMove(pointer);
+    }
+
+    onMouseWheel(evt) {
         let delta = 0;
         if (evt.wheelDelta) { /* IE/Opera. */
             delta = evt.wheelDelta / 120;
@@ -73,10 +79,6 @@ class InteractionModule {
     }
 
     zoom(scale, pointer) {
-
-        console.log(scale);
-        console.log(pointer);
-        console.log('---');
 
         let scaleOld = this.chart.view.scale;
         if (scale < 0.00001) {
@@ -130,7 +132,6 @@ class InteractionModule {
     onDragEnd(evt) {
         this.drag.dragging = false;
     }
-
 
     /**
     * Get the pointer location from a touch location

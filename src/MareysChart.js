@@ -16,10 +16,17 @@ class MareysChart {
         Prototypes.bind();
 
         this.div = id;
+
+        // Creating the data object
         this.data = {
             stations: stations.sort((a, b) => a.dist - b.dist),
-            trains: MareysTrain.castToMareysTrains(this, trains)
+            trains: MareysTrain.castToMareysTrains(this, trains),
+            trainsById: {}
         };
+
+        this.data.trains.forEach(t => {
+            this.data.trainsById[t.id] = t;
+        });
 
         this.options = {
             interaction: {
@@ -30,12 +37,13 @@ class MareysChart {
                 end: new Date().addDays(1)
             }
         };
-
-        // Defining the axis
-        this.axis = new MareysAxis(id, this);
+        this.options.timeWindow.totalMinutes = (this.options.timeWindow.end.getTime() - this.options.timeWindow.start.getTime()) / (1000 * 60);
 
         // Define canvas for this chart
         this.canvas = new Canvas(id, this);
+
+        // Defining the axis
+        this.axis = new MareysAxis(id, this);
 
         // Define the view
         this.view = new View(id, this);
@@ -56,8 +64,11 @@ class MareysChart {
 
         // Draw the trains
         MareysTrain.drawTrains(this, this.data.trains);
-
     } 
+
+    handleMouseMove() {
+
+    }
 
 }
 

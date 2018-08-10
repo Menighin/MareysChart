@@ -1,3 +1,5 @@
+import MareysChart from "./MareysChart";
+
 'use strict';
 
 class MareysTrain {
@@ -8,6 +10,7 @@ class MareysTrain {
         this.group = group;
         this.label = label;
         this.schedule = schedule.sort((a, b) => a.time - b.time);
+        this.points = undefined; // This is calculated after and stored
     }
 
     /**
@@ -26,6 +29,11 @@ class MareysTrain {
         return mareysTrains;
     }
 
+    /**
+     * Static method to draw all the lines and dots of trains
+     * @param {MareysChart} chart 
+     * @param {Array.<MareysTrain>} trains 
+     */
     static drawTrains(chart, trains) {
         let ctx = chart.canvas.ctx;
 
@@ -49,7 +57,7 @@ class MareysTrain {
     }
 
     /**
-     * Draws this train line
+     * Draws this train's lines
      */
     _drawLine() {
         let ctx = this.chart.canvas.ctx;
@@ -67,6 +75,9 @@ class MareysTrain {
         });
     }
 
+    /**
+     * Draw this train's dots
+     */
     _drawDot() {
         let ctx = this.chart.canvas.ctx;
         ctx.fillStyle = '#e5593f';
@@ -81,25 +92,31 @@ class MareysTrain {
         });
     }
 
-
+    /**
+     * Turn this train's schedule into points to be drawn
+     * This should be calculated just once for each train and then saved for performance reasons
+     * @returns {Array.<{x, y>}} Points
+     */
     _getPointsToDraw() {
         if (!this.points) {
-            let drawingArea = this.chart.axis._getGridDrawingArea();
-            let timeWindow =this.chart.options.timeWindow;
-
-            let maxDist = this.chart.data.stations.last().dist;
-            let totalMinutes = (timeWindow.end.getTime() - timeWindow.start.getTime()) / (1000 * 60);
-            let xFactor = (drawingArea.x2 - drawingArea.x1) / totalMinutes;
-            let yFactor = (drawingArea.y2 - drawingArea.y1) / maxDist;
+            let axis = this.chart.axis;
 
             // Defining coordinates of points
             this.points = [];
             this.schedule.forEach(s => {
-                this.points.push({x: Math.round(drawingArea.x1 + xFactor * s.time.diffMinutesWith(timeWindow.start)), y: Math.round(drawingArea.y1 + yFactor * s.dist)});
+                this.points.push({
+                    x: Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * s.time.diffMinutesWith(axis.timeWindow.start)), 
+                    y: Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * s.dist)
+                });
             });
         }
 
         return this.points;
+    }
+
+
+    intersectsWith(point) {
+        
     }
 
 }

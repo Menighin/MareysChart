@@ -27,6 +27,9 @@ class MareysAxis {
      */
     _calculateHelpers() {
         let ctx = this.div.getContext('2d');
+        let height = this.chart.canvas.h;
+        let width = this.chart.canvas.w;
+
         ctx.font = STATION_FONTS;
         this.largestStation = this.stations.reduce((previous, s) => {
 
@@ -38,6 +41,17 @@ class MareysAxis {
 
             return previous.width > station.width ? previous : station
         }, {length: 0, width: 0});
+
+        this.drawing = {
+            area: {
+                y1: Y_AXIS_TOP_MARGIN - 3,
+                y2: height + Y_AXIS_TOP_MARGIN - X_AXIS_HEIGHT - 3,
+                x1: this.largestStation.width + Y_AXIS_WIDTH_PAN,
+                x2: width
+            },
+        };
+        this.drawing.xFactor = (this.drawing.area.x2 - this.drawing.area.x1) / this.timeWindow.totalMinutes;
+        this.drawing.yFactor = (this.drawing.area.y2 - this.drawing.area.y1) / this.stations.last().dist;
     }
 
 
@@ -51,10 +65,6 @@ class MareysAxis {
      */
     _drawStations() {
         let ctx = this.chart.canvas.ctx;
-        let maxDist = this.stations.last().dist;
-        var drawingArea = this._getGridDrawingArea();
-        let yFactor = (drawingArea.y2 - drawingArea.y1) / maxDist;
-
 
         ctx.font = STATION_FONTS;
         ctx.lineWidth = 1;
@@ -63,14 +73,14 @@ class MareysAxis {
         ctx.beginPath();
         this.chart.data.stations.forEach(s => {
 
-            let y = Y_AXIS_TOP_MARGIN + s.dist * yFactor;
+            let y = Y_AXIS_TOP_MARGIN + s.dist * this.drawing.yFactor;
             
             // Draw label
             ctx.fillText(s.label, Y_AXIS_LEFT_MARGIN, y);
 
             // Draw the horizontal lines for station
-            ctx.moveTo(drawingArea.x1, y - 3);
-            ctx.lineTo(drawingArea.x2, y - 3);
+            ctx.moveTo(this.drawing.area.x1, y - 3);
+            ctx.lineTo(this.drawing.area.x2, y - 3);
         });
 
         ctx.stroke();
@@ -81,12 +91,8 @@ class MareysAxis {
      */
     _drawTime() {
         let ctx = this.chart.canvas.ctx;
-        let timeWindow = this.timeWindow;
-        let totalMinutes = (timeWindow.end.getTime() - timeWindow.start.getTime()) / (1000 * 60);
-        var drawingArea = this._getGridDrawingArea();
-        let xFactor = (drawingArea.x2 - drawingArea.x1) / totalMinutes;
 
-        let startDate = timeWindow.start;
+        let startDate = this.timeWindow.start;
 
         ctx.font = STATION_FONTS;
 
@@ -94,27 +100,27 @@ class MareysAxis {
         let highlightLines = [];
 
         // Generating lines & drawing labels
-        for (let i = 0; i <= totalMinutes; i++) {
+        for (let i = 0; i <= this.timeWindow.totalMinutes; i++) {
 
             startDate = startDate.addMinutes(1);
 
-            let x = this.largestStation.width + Y_AXIS_WIDTH_PAN + i * xFactor;
+            let x = this.largestStation.width + Y_AXIS_WIDTH_PAN + i * this.drawing.xFactor;
 
             if (i % 15 == 0 && i % 60 !== 0) {
                 lines.push({
                     x1: x,
-                    y1: drawingArea.y2,
+                    y1: this.drawing.area.y2,
                     x2: x,
-                    y2: drawingArea.y1
+                    y2: this.drawing.area.y1
                 });
             }
 
             if (i % 60 === 0) {
                 highlightLines.push({
                     x1: x,
-                    y1: drawingArea.y2,
+                    y1: this.drawing.area.y2,
                     x2: x,
-                    y2: drawingArea.y1
+                    y2: this.drawing.area.y1
                 });
             }
 
@@ -122,7 +128,7 @@ class MareysAxis {
             if (i > 0 && i % 60 == 0) {
                 let label = startDate.toMareysAxisString();
                 let labelWidth = ctx.measureText(label).width;
-                ctx.fillText(label, x - labelWidth / 2, drawingArea.y2 + X_AXIS_MARGIN_TOP);
+                ctx.fillText(label, x - labelWidth / 2, this.drawing.area.y2 + X_AXIS_MARGIN_TOP);
             }
         }
 
@@ -146,18 +152,6 @@ class MareysAxis {
         });
         ctx.stroke();
 
-    }
-
-    _getGridDrawingArea() {
-        let height = this.chart.canvas.h;
-        let width = this.chart.canvas.w;
-
-        return {
-            y1: Y_AXIS_TOP_MARGIN - 3,
-            y2: height + Y_AXIS_TOP_MARGIN - X_AXIS_HEIGHT - 3,
-            x1: this.largestStation.width + Y_AXIS_WIDTH_PAN,
-            x2: width
-        }
     }
 
 }

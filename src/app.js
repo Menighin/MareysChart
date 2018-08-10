@@ -28,7 +28,7 @@ let end = new Date(start.getTime() + 1000 * 60 * 60 * 24);
 
 let trains = [];
 
-for (let i = 0; i < 500; i++) {
+for (let i = 0; i < 1000; i++) {
     let train = {
         id: `t${i}`,
         group: `g${i}`,
@@ -36,7 +36,6 @@ for (let i = 0; i < 500; i++) {
     };
 
     stations.forEach(s => {
-        let date =
         train.schedule.push({
             time:  new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())),
             dist: s.dist
