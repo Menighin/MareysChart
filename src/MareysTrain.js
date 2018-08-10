@@ -30,25 +30,21 @@ class MareysTrain {
         let ctx = chart.canvas.ctx;
 
         // Drawing trains
-
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = 'tomato';
-        ctx.fillStyle = '#e5593f';
-
         // Drawing lines
         ctx.beginPath();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'tomato';
         trains.forEach(t => {
             t._drawLine();
         });
-        ctx.closePath();
         ctx.stroke();
 
         // Drawing dots
         ctx.beginPath();
+        ctx.fillStyle = '#e5593f';
         trains.forEach(t => {
             t._drawDot();
         });
-        ctx.closePath();
         ctx.fill();
     }
 
@@ -73,12 +69,14 @@ class MareysTrain {
 
     _drawDot() {
         let ctx = this.chart.canvas.ctx;
+        ctx.fillStyle = '#e5593f';
 
         // Defining coordinates of points
         let points = this._getPointsToDraw();
 
         // Drawing dots
         points.forEach((p, i) => {
+            ctx.moveTo(p.x, p.y);
             ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
         });
     }
@@ -86,7 +84,6 @@ class MareysTrain {
 
     _getPointsToDraw() {
         if (!this.points) {
-            let ctx = this.chart.canvas.ctx;
             let drawingArea = this.chart.axis._getGridDrawingArea();
             let timeWindow =this.chart.options.timeWindow;
 
