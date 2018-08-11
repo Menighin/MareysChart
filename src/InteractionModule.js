@@ -15,13 +15,15 @@ class InteractionModule {
 
     _bindEvents() {
 
-        this.div.addEventListener('mousewheel', (event) => {this.onMouseWheel(event)});
-        this.div.addEventListener('mousemove',  (event) => {this.onMouseMove(event)});
+        this.div.addEventListener('mousewheel',  (event) => {this.onMouseWheel(event)});
+        this.div.addEventListener('mousemove',   (event) => {this.onMouseMove(event)});
+        this.div.addEventListener('mouseclick',  (event) => {this.onMouseClick(event)});
 
         this.hammer.on('hammer.input', (event) => {this.onTouch(event)});
         this.hammer.on('panstart',     (event) => {this.onDragStart(event)});
         this.hammer.on('panmove',      (event) => {this.onDrag(event)});
         this.hammer.on('panend',       (event) => {this.onDragEnd(event)});
+        this.hammer.on('tap',          (event) => {this.onMouseClick(event)});
         
     }
 
@@ -39,6 +41,10 @@ class InteractionModule {
         }
     }
 
+    /**
+     * Handler for mouse move event
+     * @param {Event} evt 
+     */
     onMouseMove(evt) {
         let pointer = this.getPointer({x:event.clientX, y:event.clientY});
         let canvasPos = this.chart.canvas.DOMtoCanvas(pointer);
@@ -50,6 +56,25 @@ class InteractionModule {
         this.chart.handleMouseMove(this.mousePos);
     }
 
+    /**
+     * Handler for mouse click event
+     * @param {Event} evt 
+     */
+    onMouseClick(evt) {
+        let pointer = this.getPointer(evt.center);
+        let canvasPos = this.chart.canvas.DOMtoCanvas(pointer);
+        let clickPos = {
+            client: pointer,
+            canvas: canvasPos
+        };
+
+        this.chart.handleMouseClick(clickPos);
+    }
+
+    /**
+     * Handler for mouse wheel
+     * @param {Event} evt 
+     */
     onMouseWheel(evt) {
         let delta = 0;
         if (evt.wheelDelta) { /* IE/Opera. */
@@ -84,6 +109,11 @@ class InteractionModule {
         event.preventDefault();
     }
 
+    /**
+     * Set the view scale according to mouse wheel
+     * @param {Number} scale 
+     * @param {Object} pointer 
+     */
     zoom(scale, pointer) {
 
         let scaleOld = this.chart.view.scale;
@@ -118,11 +148,19 @@ class InteractionModule {
 
     }
 
+    /**
+     * Handler for start drag event
+     * @param {Event} evt 
+     */
     onDragStart(evt) {
         this.drag.initialTranslation = Object.assign({}, this.chart.view.translation);
         this.drag.dragging = true;
     }
 
+    /**
+     * Handler for drag event
+     * @param {Event} evt 
+     */
     onDrag(evt) {
         let pointer = this.getPointer(evt.center);
         let diff =  {
@@ -135,6 +173,10 @@ class InteractionModule {
         this.chart.view.translation = {x:this.drag.initialTranslation.x + diff.x, y:this.drag.initialTranslation.y + diff.y};
     }
 
+    /**
+     * Handler for dragEnd event
+     * @param {Event} evt 
+     */
     onDragEnd(evt) {
         this.drag.dragging = false;
     }

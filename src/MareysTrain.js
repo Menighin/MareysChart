@@ -1,11 +1,12 @@
-import MareysChart from "./MareysChart";
-
 'use strict';
+
+const MOUSE_DISTANCE_TOLERANCE = 4;
 
 class MareysTrain {
 
     constructor(chart, id, group, label, schedule) {
         this.chart = chart;
+        this.options = chart.options;
         this.id = id;
         this.group = group;
         this.label = label;
@@ -36,28 +37,40 @@ class MareysTrain {
     static drawTrains(chart) {
         let ctx = chart.canvas.ctx;
         let trains = chart.data.trains;
+        let selectionOptions = chart.options.selection;
         let trainsById = chart.data.trainsById;
+        let hoveredTrainId = chart.selectionModule.hoveredTrainId;
+        let selectedTrainsIds = chart.selectionModule.selectedTrainsIds;
+        let lastSelectedTrainId = selectedTrainsIds ? selectedTrainsIds.last() : undefined;
 
         // Drawing trains
         // Drawing commom lines
         ctx.beginPath();
         ctx.lineWidth = 3;
-        ctx.strokeStyle = chart.data.hoverTrainId ? '#999' : 'tomato';
+        ctx.strokeStyle = selectedTrainsIds ? selectionOptions.selectDimColor : 'tomato';
         trains.forEach(t => {
-            if (t.id != chart.data.hoverTrainId)
+            if (t.id != hoveredTrainId && t.id != lastSelectedTrainId)
                 t._drawLine();
         });
         ctx.stroke();
-
+        
         // Drawing hover lines
-        if (chart.data.hoverTrainId) {
+        if (hoveredTrainId) {
             ctx.beginPath();
             ctx.lineWidth = 4;
-            ctx.strokeStyle = 'tomato';
-            trainsById[chart.data.hoverTrainId]._drawLine();
+            ctx.strokeStyle = selectionOptions.hoverColor;
+            trainsById[hoveredTrainId]._drawLine();
             ctx.stroke();
         }
-
+        
+        // Drawing selected train
+        if (lastSelectedTrainId) {
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = selectionOptions.selectColor;
+            trainsById[lastSelectedTrainId]._drawLine();
+            ctx.stroke();
+        }
         // Drawing dots
         // ctx.beginPath();
         // ctx.fillStyle = '#e5593f';
@@ -125,16 +138,14 @@ class MareysTrain {
         return this.points;
     }
 
-
     _linePointNearestMouse(line, x, y) {
-        //
-        var lerp=function(a,b,x){ return(a+x*(b-a)); };
-        var dx=line.x2-line.x1;
-        var dy=line.y2-line.y1;
-        var t=((x-line.x1)*dx+(y-line.y1)*dy)/(dx*dx+dy*dy);
-        var lineX=lerp(line.x1, line.x2, t);
-        var lineY=lerp(line.y1, line.y2, t);
-        return({x:lineX,y:lineY});
+        let lerp = (a, b, x) => a + x * (b - a);
+        let dx = line.x2 - line.x1;
+        let dy = line.y2 - line.y1;
+        let t = ((x - line.x1) * dx + (y - line.y1) * dy) / (dx * dx + dy * dy);
+        let lineX = lerp(line.x1, line.x2, t);
+        let lineY = lerp(line.y1, line.y2, t);
+        return { x: lineX, y: lineY };
     };
 
     /**
@@ -163,11 +174,11 @@ class MareysTrain {
             }
 
             let linePoint = this._linePointNearestMouse(line, pointer.canvas.x, pointer.canvas.y);
-            var dx=pointer.canvas.x-linePoint.x;
-            var dy=pointer.canvas.y-linePoint.y;
-            var distance=Math.abs(Math.sqrt(dx*dx+dy*dy));
+            let dx = pointer.canvas.x - linePoint.x;
+            let dy = pointer.canvas.y - linePoint.y;
+            let distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
 
-            if (distance <= 5) return true;
+            if (distance <= MOUSE_DISTANCE_TOLERANCE) return true;
         }
 
         return false;

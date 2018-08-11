@@ -38,6 +38,11 @@ class MareysChart {
             timeWindow: {
                 start: new Date(),
                 end: new Date().addDays(1)
+            },
+            selection: {
+                hoverColor: '#BADA55',
+                selectColor: 'deepskyblue',
+                selectDimColor: '#ccc'
             }
         };
         this.options.timeWindow.totalMinutes = (this.options.timeWindow.end.getTime() - this.options.timeWindow.start.getTime()) / (1000 * 60);
@@ -72,13 +77,24 @@ class MareysChart {
         MareysTrain.drawTrains(this);
     } 
 
+    /**
+     * Handle the mouse move event with the hover effect
+     * @param {Object} pointer 
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer 
+     */
     handleMouseMove(pointer) {
-        let hoveredTrains = this.selectionModule.getTrainsAt(pointer);
+        this.selectionModule.handleHoverEvent(pointer);
+    }
 
-        if (hoveredTrains.length > 0)
-            this.data.hoverTrainId = hoveredTrains.last().id;
-        else
-            this.data.hoverTrainId = undefined;
+    /**
+     * Handle the mouse click event to select a train
+     * @param {Object} pointer
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer  
+     */
+    handleMouseClick(pointer) {
+        this.selectionModule.handleMouseClick(pointer);
     }
 }
 
