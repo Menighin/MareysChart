@@ -23,6 +23,7 @@ class MareysChart {
             stations: stations.sort((a, b) => a.dist - b.dist),
             trains: MareysTrain.castToMareysTrains(this, trains),
             trainsById: {},
+            anchorPoints: [],
             hoverTrainId: undefined,
             selectedTrainIds: undefined
         };

@@ -2,18 +2,18 @@
 
 class SelectionModule {
 
-    constructor(id, chart) {
-        this.id = id;
-        this.div = document.querySelector(`#${id}`);
-        this.chart = chart;
-    }
-
     get hoveredTrainId() { return this._hoveredTrainId; }
     set hoveredTrainId(id) { this._hoveredTrainId = id; }
 
     get selectedTrainsIds() { return this._selectedTrainsIds; }
     set selectedTrainsIds(ids) { this._selectedTrainsIds = ids; }
     
+    constructor(id, chart) {
+        this.id = id;
+        this.div = document.querySelector(`#${id}`);
+        this.chart = chart;
+    }
+
     /**
      * Handles the hover event
      * @param {Object} pointer - The pointer object
@@ -23,10 +23,14 @@ class SelectionModule {
     handleHoverEvent(pointer) {
         let hoveredTrains = this.getTrainsAt(pointer);
 
-        if (hoveredTrains.length > 0)
+        if (hoveredTrains.length > 0) {
             this.hoveredTrainId = hoveredTrains.last().id;
-        else
+            this.div.style.cursor = 'pointer';
+        }
+        else {
             this.hoveredTrainId = undefined;
+            this.div.style.cursor = 'auto';
+        }
     }
 
     /**
@@ -38,8 +42,9 @@ class SelectionModule {
     handleMouseClick(pointer) {
         let clickedTrains = this.getTrainsAt(pointer);
 
-        if (clickedTrains.length > 0)
+        if (clickedTrains.length > 0) {
             this.selectedTrainsIds = clickedTrains.map(t => t.id);
+        }
         else 
             this.selectedTrainsIds = undefined;
     }

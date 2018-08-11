@@ -4,6 +4,24 @@ const MOUSE_DISTANCE_TOLERANCE = 4;
 
 class MareysTrain {
 
+    get id() { return this._id; }
+    set id(id) { this._id = id; }
+
+    get group()      { return this._group; }
+    set group(group) { this._group = group; }
+
+    get label()      { return this._label; }
+    set label(label) { this._label = label; }
+
+    get schedule()         { return this._schedule; }
+    set schedule(schedule) { this._schedule = schedule; }
+
+    get points()       { return this._points ? this._points : this._calculatePoints(); }
+    set points(points) { this._points = points; }
+
+    get achorPoints()            { return this._achorPoints; }
+    set achorPoints(achorPoints) { this._achorPoints = achorPoints; }
+
     constructor(chart, id, group, label, schedule) {
         this.chart = chart;
         this.options = chart.options;
@@ -11,7 +29,6 @@ class MareysTrain {
         this.group = group;
         this.label = label;
         this.schedule = schedule.sort((a, b) => a.time - b.time);
-        this.points = undefined; // This is calculated after and stored
     }
 
     /**
@@ -81,13 +98,25 @@ class MareysTrain {
     }
 
     /**
+     * Draw the anchor points for this train
+     */
+    _drawAnchorPoints() {
+
+        let selectedTrainsIds = this.chart.selectionModule.selectedTrainsIds || [];
+        if (selectedTrainsIds === 0) return; 
+
+
+
+    }
+
+    /**
      * Draws this train's lines
      */
     _drawLine() {
         let ctx = this.chart.canvas.ctx;
 
         // Defining coordinates of points
-        let points = this._getPointsToDraw();
+        let points = this.points;
        
         // Drawing line
         ctx.moveTo(points[0].x, points[0].y);
@@ -117,25 +146,31 @@ class MareysTrain {
     }
 
     /**
-     * Turn this train's schedule into points to be drawn
+     * Turn this train's schedule into points to be drawn and store it
      * This should be calculated just once for each train and then saved for performance reasons
-     * @returns {Array.<{x, y>}} Points
+     * @returns {Array} - Calculated points
      */
-    _getPointsToDraw() {
-        if (!this.points) {
+    _calculatePoints(force = false) {
+        if (!this._points || force) {
             let axis = this.chart.axis;
 
             // Defining coordinates of points
-            this.points = [];
+            this._points = [];
             this.schedule.forEach(s => {
-                this.points.push({
+                this._points.push({
                     x: Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * s.time.diffMinutesWith(axis.timeWindow.start)), 
                     y: Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * s.dist)
                 });
             });
         }
 
-        return this.points;
+        return this._points;
+    }
+
+    _calculateAnchorPoints(force = false) {
+        if (!this._achorPoints || force) {
+            
+        }
     }
 
     _linePointNearestMouse(line, x, y) {
@@ -156,7 +191,7 @@ class MareysTrain {
      * @returns {Boolean} - If the train is intersecting with the pointer or not
      */
     intersectsWith(pointer) {
-        let points = this._getPointsToDraw();
+        let points = this.points;
 
         if (points.length <= 1) return false;
 
@@ -184,6 +219,9 @@ class MareysTrain {
         return false;
 
     }
+
+
+
 
 }
 

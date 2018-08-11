@@ -9,7 +9,17 @@ const Y_AXIS_LEFT_MARGIN = 5;
 const Y_AXIS_TOP_MARGIN = 15;
 const X_AXIS_MARGIN_TOP = 15;
 
+/** Class to deal with drawing the axis and calculating the drawing area and drawing factors */
 class MareysAxis {
+
+    get timeWindow()           { return this._timeWindow; }
+    set timeWindow(timeWindow) { this._timeWindow = timeWindow; }
+
+    /**
+     *  @property {Object} drawing - Drawing object containing {area, xFactor, yFactor}
+    */
+    get drawing()        { return this._drawing; }
+    set drawing(drawing) { this._drawing = drawing; }
 
     constructor(id, mareysChart) {
         this.div = document.querySelector(`#${id}`);
