@@ -20,12 +20,16 @@ class MareysAnchorPoint {
     get time()     { return this._time; }
     set time(time) { this._time = time; }
 
-    constructor(trainId, x, y, time, dist) {
+    get isActive()         { return this._isActive; }
+    set isActive(isActive) { this._isActive = isActive; }
+
+    constructor(trainId, x, y, time, dist, isActive = false) {
         this.trainId = trainId;
         this.x = x;
         this.y = y;
         this.dist = dist;
         this.time = time;
+        this.isActive = isActive;
     }
 
     /**

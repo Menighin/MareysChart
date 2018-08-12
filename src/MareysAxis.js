@@ -112,8 +112,6 @@ class MareysAxis {
         // Generating lines & drawing labels
         for (let i = 0; i <= this.timeWindow.totalMinutes; i++) {
 
-            startDate = startDate.addMinutes(1);
-
             let x = Math.round(this.largestStation.width + Y_AXIS_WIDTH_PAN + i * this.drawing.xFactor);
 
             if (i % 15 == 0 && i % 60 !== 0) {
@@ -140,6 +138,8 @@ class MareysAxis {
                 let labelWidth = ctx.measureText(label).width;
                 ctx.fillText(label, x - labelWidth / 2, this.drawing.area.y2 + X_AXIS_MARGIN_TOP);
             }
+
+            startDate = startDate.addMinutes(1);
         }
 
         // Drawing grid

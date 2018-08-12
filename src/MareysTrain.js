@@ -18,8 +18,13 @@ class MareysTrain {
     get schedule()         { return this._schedule; }
     set schedule(schedule) { this._schedule = schedule; }
 
+    /** @property {Array.<{x, y}>} - List of points*/
     get points()       { return this._points ? this._points : this._calculatePoints(); }
     set points(points) { this._points = points; }
+
+    /** @property {Object} - points as a dictionary [x, y] */
+    get pointsDict() { return this._pointsDict ? this._pointsDict : this._calculatePointsDict(); }
+    set pointsDict(pointsDict) { this._pointsDict = pointsDict}
 
     get anchorPoints()            { return this._achorPoints ? this._anchorPoints : this._calculateAnchorPoints(); }
     set anchorPoints(achorPoints) { this._achorPoints = achorPoints; }
@@ -93,10 +98,7 @@ class MareysTrain {
 
         // Drawing anchor points
         if (lastSelectedTrainId) {
-            ctx.beginPath();
-            ctx.fillStyle = 'green';
             trainsById[lastSelectedTrainId]._drawAnchorPoints();
-            ctx.fill();
         }
 
         // Drawing dots
@@ -114,7 +116,18 @@ class MareysTrain {
      */
     _drawAnchorPoints() {
         let ctx = this.chart.canvas.ctx;
-        this.anchorPoints.forEach(a => a.draw(ctx));
+
+        // Draw the not active anchor points
+        ctx.beginPath();
+        ctx.fillStyle = 'cyan';
+        this.anchorPoints.filter(a => !a.isActive).forEach(a => a.draw(ctx));
+        ctx.fill();
+
+        // Draw the active anchor points
+        ctx.beginPath();
+        ctx.fillStyle = 'green';
+        this.anchorPoints.filter(a => a.isActive).forEach(a => a.draw(ctx));
+        ctx.fill();
     }
 
     /**
@@ -153,9 +166,10 @@ class MareysTrain {
         });
     }
 
-    /**
+    /**[
      * Turn this train's schedule into points to be drawn and store it
      * This should be calculated just once for each train and then saved for performance reasons
+     * @param {Boolean} [force = false] - If this should be calculated whether it already has a value or not
      * @returns {Array} - Calculated points
      */
     _calculatePoints(force = false) {
@@ -173,6 +187,22 @@ class MareysTrain {
         }
 
         return this._points;
+    }
+
+    /**
+     * Construct a dictionary of points [x, y] for this train
+     * Useful for lookpus O(1)
+     * @param {Boolean} [force = false] - If this should be calculated whether it already has a value or not
+     */
+    _calculatePointsDict(force = false) {
+        if (!this._pointsDict || force) {
+            let points = this.points;
+
+            this._pointsDict = {};
+            points.forEach(p => this._pointsDict[p.x] = p.y);
+        }
+
+        return this._pointsDict;
     }
 
     _calculateAnchorPoints(force = false) {
@@ -203,7 +233,7 @@ class MareysTrain {
                 // Calculates for every 15 minutes the position of the anchor
                 let fifteenMinutes = 1000 * 60 * 15;
 
-                let timeToCheck = p1.xMillis + (fifteenMinutes - p1.xMillis % fifteenMinutes);
+                let timeToCheck = p1.xMillis;
                 
                 if (timeToCheck % fifteenMinutes !== 0)
                     timeToCheck = p1.xMillis + (fifteenMinutes - p1.xMillis % fifteenMinutes);
@@ -211,13 +241,16 @@ class MareysTrain {
                 while (timeToCheck <= p2.xMillis) {
                     let datetime = new Date(timeToCheck);
                     let dist = lineEquation(timeToCheck);
+                    let x = Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * datetime.diffMinutesWith(axis.timeWindow.start));
+                    let y = Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * dist);
 
                     this._anchorPoints.push(new MareysAnchorPoint(
                         this.id,
-                        Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * datetime.diffMinutesWith(axis.timeWindow.start)),
-                        Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * dist),
+                        x,
+                        y,
                         datetime,
-                        dist 
+                        dist,
+                        this.pointsDict[x] && this.pointsDict[x] === y 
                     ));
 
                     timeToCheck += fifteenMinutes;
