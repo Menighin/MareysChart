@@ -32,13 +32,24 @@ class MareysChart {
             this.data.trainsById[t.id] = t;
         });
 
+
+        let fifteenMinutes = 1000 * 60 * 15;
+
+        let start = new Date();
+        start = new Date(start.getTime() - 1000 * 60 * 60 * 12);
+
+        if (start.getTime() % fifteenMinutes !== 0)
+            start = new Date(start.getTime() + (fifteenMinutes - start.getTime() % fifteenMinutes));
+
+        let end = new Date(start.getTime() + 1000 * 60 * 60 * 24);
+
         this.options = {
             interaction: {
                 zoomSpeed: 1
             },
             timeWindow: {
-                start: new Date(),
-                end: new Date().addDays(1)
+                start: start,
+                end: end
             },
             selection: {
                 hoverColor: '#BADA55',

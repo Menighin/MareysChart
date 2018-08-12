@@ -98,6 +98,15 @@ class MareysTrain {
             trainsById[lastSelectedTrainId]._drawAnchorPoints();
             ctx.fill();
         }
+
+        // Drawing dots
+        // ctx.beginPath();
+        // ctx.fillStyle = '#e5593f';
+        // trains.forEach(t => {
+        //     t._drawDot();
+        // });
+        // ctx.fill();
+
     }
 
     /**
@@ -135,7 +144,7 @@ class MareysTrain {
         ctx.fillStyle = '#e5593f';
 
         // Defining coordinates of points
-        let points = this._getPointsToDraw();
+        let points = this.points;
 
         // Drawing dots
         points.forEach((p, i) => {
@@ -193,7 +202,11 @@ class MareysTrain {
 
                 // Calculates for every 15 minutes the position of the anchor
                 let fifteenMinutes = 1000 * 60 * 15;
+
                 let timeToCheck = p1.xMillis + (fifteenMinutes - p1.xMillis % fifteenMinutes);
+                
+                if (timeToCheck % fifteenMinutes !== 0)
+                    timeToCheck = p1.xMillis + (fifteenMinutes - p1.xMillis % fifteenMinutes);
 
                 while (timeToCheck <= p2.xMillis) {
                     let datetime = new Date(timeToCheck);

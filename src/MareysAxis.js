@@ -83,7 +83,7 @@ class MareysAxis {
         ctx.beginPath();
         this.chart.data.stations.forEach(s => {
 
-            let y = Y_AXIS_TOP_MARGIN + s.dist * this.drawing.yFactor;
+            let y = Math.round(Y_AXIS_TOP_MARGIN + s.dist * this.drawing.yFactor);
             
             // Draw label
             ctx.fillText(s.label, Y_AXIS_LEFT_MARGIN, y);
@@ -114,7 +114,7 @@ class MareysAxis {
 
             startDate = startDate.addMinutes(1);
 
-            let x = this.largestStation.width + Y_AXIS_WIDTH_PAN + i * this.drawing.xFactor;
+            let x = Math.round(this.largestStation.width + Y_AXIS_WIDTH_PAN + i * this.drawing.xFactor);
 
             if (i % 15 == 0 && i % 60 !== 0) {
                 lines.push({
