@@ -1,3 +1,5 @@
+import MareysAnchorPoint from "./MareysAnchorPoint";
+
 'use strict';
 
 const MOUSE_DISTANCE_TOLERANCE = 4;
@@ -19,8 +21,8 @@ class MareysTrain {
     get points()       { return this._points ? this._points : this._calculatePoints(); }
     set points(points) { this._points = points; }
 
-    get achorPoints()            { return this._achorPoints; }
-    set achorPoints(achorPoints) { this._achorPoints = achorPoints; }
+    get anchorPoints()            { return this._achorPoints ? this._anchorPoints : this._calculateAnchorPoints(); }
+    set anchorPoints(achorPoints) { this._achorPoints = achorPoints; }
 
     constructor(chart, id, group, label, schedule) {
         this.chart = chart;
@@ -88,25 +90,22 @@ class MareysTrain {
             trainsById[lastSelectedTrainId]._drawLine();
             ctx.stroke();
         }
-        // Drawing dots
-        // ctx.beginPath();
-        // ctx.fillStyle = '#e5593f';
-        // trains.forEach(t => {
-        //     t._drawDot();
-        // });
-        // ctx.fill();
+
+        // Drawing anchor points
+        if (lastSelectedTrainId) {
+            ctx.beginPath();
+            ctx.fillStyle = 'green';
+            trainsById[lastSelectedTrainId]._drawAnchorPoints();
+            ctx.fill();
+        }
     }
 
     /**
      * Draw the anchor points for this train
      */
     _drawAnchorPoints() {
-
-        let selectedTrainsIds = this.chart.selectionModule.selectedTrainsIds || [];
-        if (selectedTrainsIds === 0) return; 
-
-
-
+        let ctx = this.chart.canvas.ctx;
+        this.anchorPoints.forEach(a => a.draw(ctx));
     }
 
     /**
@@ -168,9 +167,52 @@ class MareysTrain {
     }
 
     _calculateAnchorPoints(force = false) {
-        if (!this._achorPoints || force) {
-            
+
+        if (!this._anchorPoints || force) {
+            let axis = this.chart.axis;
+            this._anchorPoints = [];
+            for (let i = 0; i < this.schedule.length - 1; i++) {
+                
+                // Define the points of the line
+                let p1 = { 
+                    x: this.schedule[i].time,
+                    xMillis: this.schedule[i].time.getTime(),
+                    y: this.schedule[i].dist
+                };
+
+                let p2 = {
+                    x: this.schedule[i + 1].time,
+                    xMillis: this.schedule[i + 1].time.getTime(),
+                    y: this.schedule[i + 1].dist
+                };
+
+                // Calculating the line equation
+                let slope = (p2.y - p1.y) / (p2.xMillis - p1.xMillis);
+
+                let lineEquation = (x) => slope * (x - p1.x) + p1.y;
+
+                // Calculates for every 15 minutes the position of the anchor
+                let fifteenMinutes = 1000 * 60 * 15;
+                let timeToCheck = p1.xMillis + (fifteenMinutes - p1.xMillis % fifteenMinutes);
+
+                while (timeToCheck <= p2.xMillis) {
+                    let datetime = new Date(timeToCheck);
+                    let dist = lineEquation(timeToCheck);
+
+                    this._anchorPoints.push(new MareysAnchorPoint(
+                        this.id,
+                        Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * datetime.diffMinutesWith(axis.timeWindow.start)),
+                        Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * dist),
+                        datetime,
+                        dist 
+                    ));
+
+                    timeToCheck += fifteenMinutes;
+                }
+            }
         }
+
+        return this._anchorPoints;
     }
 
     _linePointNearestMouse(line, x, y) {

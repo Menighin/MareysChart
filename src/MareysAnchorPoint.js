@@ -20,12 +20,21 @@ class MareysAnchorPoint {
     get time()     { return this._time; }
     set time(time) { this._time = time; }
 
-    constructor(trainId, x, y, dist, time) {
+    constructor(trainId, x, y, time, dist) {
         this.trainId = trainId;
         this.x = x;
         this.y = y;
         this.dist = dist;
         this.time = time;
+    }
+
+    /**
+     * Draws this anchor point on the context passed
+     * @param {Object} ctx - The c ontext to be drawn
+     */
+    draw(ctx) {
+        ctx.moveTo(this.x, this.y);
+        ctx.arc(this.x, this.y, 3, 0, 2 * Math.PI);
     }
 }
 
