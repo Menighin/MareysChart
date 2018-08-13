@@ -164,7 +164,7 @@ class InteractionModule {
         let pointer = this.getPointer(evt.center);
 
         // If the chart doesn't handle the drag event,
-        // handle it by dragging the whole canvas around
+        // handle it by dragging the whole canvas around (default)
         if (!this.chart.handleDragEvent(pointer)) {
             let diff = Utils.diffPoints(pointer.client, this.touch.client);
     
@@ -180,6 +180,8 @@ class InteractionModule {
      * @param {Event} evt 
      */
     onDragEnd(evt) {
+        let pointer = this.getPointer(evt.center);
+        this.chart.handleDragEndEvent(pointer);
         this.drag.dragging = false;
     }
 

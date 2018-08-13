@@ -128,6 +128,21 @@ class MareysChart {
         }
         return false;
     }
+
+    /**
+     * Handles the drag end event
+     * @param {Object} pointer
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer
+     */
+    handleDragEndEvent(pointer) {
+        let elements = this.interactionModule.drag.elements;
+        
+        if (elements.anchorPoints.any()) {
+            let anchorPoint = elements.anchorPoints.last();
+            this.data.trainsById[anchorPoint.trainId].saveVirtualTrain(anchorPoint, pointer);
+        }
+    }
 }
 
 export default MareysChart;

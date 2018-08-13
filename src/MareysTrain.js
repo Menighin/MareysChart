@@ -225,8 +225,8 @@ class MareysTrain {
             this._points = [];
             this.schedule.forEach(s => {
                 this._points.push({
-                    x: Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * s.time.diffMinutesWith(axis.timeWindow.start)), 
-                    y: Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * s.dist)
+                    x: Math.round(axis.valueToXAxis(s.time.diffMinutesWith(axis.timeWindow.start))), 
+                    y: Math.round(axis.valueToYAxis(s.dist))
                 });
             });
         }
@@ -289,8 +289,8 @@ class MareysTrain {
                 while (timeToCheck <= p2.xMillis) {
                     let datetime = new Date(timeToCheck);
                     let dist = lineEquation(timeToCheck);
-                    let x = Math.round(axis.drawing.area.x1 + axis.drawing.xFactor * datetime.diffMinutesWith(axis.timeWindow.start));
-                    let y = Math.round(axis.drawing.area.y1 + axis.drawing.yFactor * dist);
+                    let x = Math.round(axis.valueToXAxis(datetime.diffMinutesWith(axis.timeWindow.start)));
+                    let y = Math.round(axis.valueToYAxis(dist));
 
                     this._anchorPoints.push(new MareysAnchorPoint(
                         this.id,
@@ -401,6 +401,43 @@ class MareysTrain {
         }
 
         anchorPoint.y = pointer.canvas.y;
+    }
+
+    /**
+     * Saves the new anchor point that was dragged around as the trip itself
+     * @param {MareysAnchorPoint} - The Anchor point to be dragged
+     * @param {Object} pointer - The position where it should be dragged to
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates
+     */
+    saveVirtualTrain(anchorPoint, pointer) {
+        this.points = this.virtualTrainPoints.map(p => {
+            return {x: p.x, y: p.y};
+        });
+
+        // Calculating value for dist
+        let dist = this.chart.axis.yAxisToValue(pointer.canvas.y);
+
+        // Updates the virtual train with the new schedule and point
+        let posToInsert = 0;
+
+        for (posToInsert = 0; posToInsert < this.virtualTrainPoints.length; posToInsert++)
+            if (this.virtualTrainPoints[posToInsert].x >= anchorPoint.x) 
+                break;
+
+        if (anchorPoint.isActive) { // If it is an active anchor, schedule already exists
+            this.schedule[posToInsert].dist = dist;
+        } else { // Insert new schedule
+            this.schedule.splice(posToInsert, 0, {time: anchorPoint.time, dist: dist});
+        }
+
+        anchorPoint.isActive = true;
+        this._calculatePoints(true);
+        this._calculatePointsDict(true);
+        this._calculateAnchorPoints(true);
+        this._calculateAnchorPointsById(true);
+
+        delete this.virtualTrainPoints;
     }
 }
 

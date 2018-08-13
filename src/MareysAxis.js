@@ -163,6 +163,42 @@ class MareysAxis {
         ctx.stroke();
 
     }
+    
+    /**
+     * Converts a value to a X axis position
+     * @param {Number} value 
+     * @returns {Number} - The value in the X axis
+     */
+    valueToXAxis(value) {
+        return this.drawing.area.x1 + this.drawing.xFactor * value;
+    }
+    
+    /**
+     * Converts a value to a Y axis position
+     * @param {Number} value 
+     * @returns {Number} - The value in the Y axis
+     */
+    valueToYAxis(value) {
+        return this.drawing.area.y1 + this.drawing.yFactor * value;
+    }
+    
+    /**
+     * Calculates the value for a given Y position
+     * @param {Number} y - The value in the Y Axis
+     * @returns {Number} - The value to the given Y position 
+     */
+    yAxisToValue(y) {
+       return (y - this.drawing.area.y1) / this.drawing.yFactor; 
+    }
+
+    /**
+     * Calculates the value for a given X position
+     * @param {Number} x - The value in the X Axis
+     * @returns {Number} - The value to the given X position 
+     */
+    xAxisToValue(x) {
+        return (x - this.drawing.area.x1) / this.drawing.xFactor; 
+     }
 
 }
 
