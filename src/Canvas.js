@@ -56,6 +56,7 @@ class Canvas {
 
 
     /**
+     * Converts a given point in the canvas to a point in DOM
      * @param {point} pos
      * @returns {point}
      */
@@ -64,7 +65,7 @@ class Canvas {
     }
 
     /**
-     *
+     * Converts a given point in the DOM to a point in the canvas
      * @param {point} pos
      * @returns {point}
      */

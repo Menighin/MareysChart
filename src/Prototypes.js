@@ -3,13 +3,27 @@
 class Prototypes {
     static bind() {
 
+        /* Array extensions */
+        if (!Array.prototype.any) {
+            Array.prototype.any = function () {
+                return this.length > 0;
+            }
+        }
+
+        if (!Array.prototype.first) {
+            Array.prototype.first = function() {
+                return this[0];
+            };
+        };
+        
         if (!Array.prototype.last) {
-            Array.prototype.last = function(){
+            Array.prototype.last = function() {
                 return this[this.length - 1];
             };
         };
 
 
+        /* Date extensions */
         if (!Date.prototype.addDays) {
             Date.prototype.addDays = function(days) {
                 var date = new Date(this.valueOf());

@@ -116,17 +116,24 @@ class MareysTrain {
      */
     _drawAnchorPoints() {
         let ctx = this.chart.canvas.ctx;
+        let hoveredAnchorPoint = this.chart.selectionModule.hoveredAnchorPoint || {};
 
         // Draw the not active anchor points
         ctx.beginPath();
-        ctx.fillStyle = 'cyan';
-        this.anchorPoints.filter(a => !a.isActive).forEach(a => a.draw(ctx));
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(100, 100, 100, 0.4)';
+        this.anchorPoints.filter(a => !a.isActive && a.id != hoveredAnchorPoint.id).forEach(a => a.draw(ctx));
+        ctx.stroke();
         ctx.fill();
 
         // Draw the active anchor points
         ctx.beginPath();
-        ctx.fillStyle = 'green';
-        this.anchorPoints.filter(a => a.isActive).forEach(a => a.draw(ctx));
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(100, 100, 100, 1)';
+        this.anchorPoints.filter(a => a.isActive || a.id === hoveredAnchorPoint.id).forEach(a => a.draw(ctx));
+        ctx.stroke();
         ctx.fill();
     }
 
@@ -205,8 +212,11 @@ class MareysTrain {
         return this._pointsDict;
     }
 
+    /**
+     * Calculates and creates the MareysAnchorPoints for this train
+     * @param {Boolean} [force = false] - If this should be calculated even if it was done before 
+     */
     _calculateAnchorPoints(force = false) {
-
         if (!this._anchorPoints || force) {
             let axis = this.chart.axis;
             this._anchorPoints = [];
@@ -305,12 +315,7 @@ class MareysTrain {
         }
 
         return false;
-
     }
-
-
-
-
 }
 
 export default MareysTrain;

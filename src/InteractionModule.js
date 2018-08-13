@@ -163,10 +163,7 @@ class InteractionModule {
      */
     onDrag(evt) {
         let pointer = this.getPointer(evt.center);
-        let diff =  {
-            x: pointer.x - this.touch.pointer.x,
-            y: pointer.y - this.touch.pointer.y
-        };
+        let diff = Utils.diffPoints(pointer, this.touch.pointer);
 
         this.chart.canvas.DOMtoCanvas(pointer)
 
