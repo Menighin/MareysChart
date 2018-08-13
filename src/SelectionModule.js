@@ -24,7 +24,7 @@ class SelectionModule {
      * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer 
      */
     handleHoverEvent(pointer) {
-        let elementsAtPonter = this._getElementsAt(pointer);
+        let elementsAtPonter = this.getElementsAt(pointer);
         let hoveredTrains = elementsAtPonter.trains;
         let hoveredAnchorPoints = elementsAtPonter.anchorPoints;
 
@@ -38,16 +38,18 @@ class SelectionModule {
 
         if (hoveredAnchorPoints.any()) {
             this.hoveredAnchorPoint = hoveredAnchorPoints.last();
+            this.hoveredTrainId = undefined;
         } else {
             this.hoveredAnchorPoint = undefined;
+            
+            if (hoveredTrains.any()) {
+                this.hoveredTrainId = hoveredTrains.last().id;
+            }
+            else {
+                this.hoveredTrainId = undefined;
+            }
         }
 
-        if (hoveredTrains.length > 0) {
-            this.hoveredTrainId = hoveredTrains.last().id;
-        }
-        else {
-            this.hoveredTrainId = undefined;
-        }
     }
 
     /**
@@ -73,7 +75,7 @@ class SelectionModule {
      * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates
      * @returns {Array.<Object>} - Object containing {trains, anchorPoints} 
      */    
-    _getElementsAt(pointer) {
+    getElementsAt(pointer) {
         let elements = {
             trains: [],
             anchorPoints: []
@@ -102,11 +104,11 @@ class SelectionModule {
      * @returns {Array.<MareysTrain>} - The trains that are on this coordinates
      */
     getTrainsAt(pointer) {
-        return this._getElementsAt(pointer).trains;
+        return this.getElementsAt(pointer).trains;
     }
 
     getAnchorPointsAt(pointer) {
-        return this._getElementsAt(pointer).anchorPoints;
+        return this.getElementsAt(pointer).anchorPoints;
     }
 }
 

@@ -90,7 +90,7 @@ class MareysChart {
     } 
 
     /**
-     * Handle the mouse move event with the hover effect
+     * Handles the mouse move event with the hover effect
      * @param {Object} pointer 
      * @param {Object} pointer.client - The coordinates {x, y} on the div
      * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer 
@@ -100,13 +100,33 @@ class MareysChart {
     }
 
     /**
-     * Handle the mouse click event to select a train
+     * Handles the mouse click event to select a train
      * @param {Object} pointer
      * @param {Object} pointer.client - The coordinates {x, y} on the div
      * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer  
      */
     handleMouseClick(pointer) {
         this.selectionModule.handleMouseClick(pointer);
+    }
+
+    /**
+     * Handles the drag event
+     * @param {Object} pointer
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer
+     * @returns {Boolean} - Whether the chart handled the event or not  
+     */
+    handleDragEvent(pointer) {
+        let elements = this.interactionModule.drag.elements;
+        
+        if (elements.anchorPoints.any()) {
+            let anchorPoint = elements.anchorPoints.last();
+
+            this.data.trainsById[anchorPoint.trainId].draggingAnchorPoint(anchorPoint, pointer);
+
+            return true;
+        }
+        return false;
     }
 }
 

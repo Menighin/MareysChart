@@ -3,6 +3,15 @@ import Utils from './Utils';
 
 class InteractionModule {
 
+    get drag()     { return this._drag; }
+    set drag(drag) { this._drag = drag; }
+
+    get touch()      { return this._touch; }
+    set touch(touch) { this._touch = touch; }
+
+    get mousePos()         { return this._mousePos; }
+    set mousePos(mousePos) { this._mousePos = mousePos; }
+
     constructor(id, chart) {
         this.div = document.querySelector(`#${id}`);
         this.chart = chart;
@@ -34,10 +43,7 @@ class InteractionModule {
      */
     onTouch(evt) {
         if (evt.isFirst) {
-            let pointer = this.getPointer(evt.center);
-            let canvasPointer = this.chart.canvas.DOMtoCanvas(pointer);
-            this.touch.pointer = pointer;
-            this.touch.canvasPointer = canvasPointer;
+            this.touch = this.getPointer(evt.center);
         }
     }
 
@@ -46,14 +52,10 @@ class InteractionModule {
      * @param {Event} evt 
      */
     onMouseMove(evt) {
-        let pointer = this.getPointer({x:event.clientX, y:event.clientY});
-        let canvasPos = this.chart.canvas.DOMtoCanvas(pointer);
-        this.mousePos = {
-            client: pointer,
-            canvas: canvasPos
-        };
-
-        this.chart.handleMouseMove(this.mousePos);
+        if (!this.drag.dragging) {
+            this.mousePos = this.getPointer({x:event.clientX, y:event.clientY});
+            this.chart.handleMouseMove(this.mousePos);
+        }
     }
 
     /**
@@ -62,13 +64,7 @@ class InteractionModule {
      */
     onMouseClick(evt) {
         let pointer = this.getPointer(evt.center);
-        let canvasPos = this.chart.canvas.DOMtoCanvas(pointer);
-        let clickPos = {
-            client: pointer,
-            canvas: canvasPos
-        };
-
-        this.chart.handleMouseClick(clickPos);
+        this.chart.handleMouseClick(pointer);
     }
 
     /**
@@ -116,6 +112,8 @@ class InteractionModule {
      */
     zoom(scale, pointer) {
 
+        let clientPointer = pointer.client;
+
         let scaleOld = this.chart.view.scale;
         if (scale < 0.00001) {
             scale = 0.00001;
@@ -127,23 +125,23 @@ class InteractionModule {
         let preScaleDragPointer = undefined;
         if (this.drag !== undefined) {
             if (this.drag.dragging === true) {
-                preScaleDragPointer = this.canvas.DOMtoCanvas(this.touch.pointer);
+                preScaleDragPointer = this.touch.canvas;
             }
         }
 
         let translation = this.chart.view.translation;
 
         let scaleFrac = scale / scaleOld;
-        let tx = (1 - scaleFrac) * pointer.x + translation.x * scaleFrac;
-        let ty = (1 - scaleFrac) * pointer.y + translation.y * scaleFrac;
+        let tx = (1 - scaleFrac) * clientPointer.x + translation.x * scaleFrac;
+        let ty = (1 - scaleFrac) * clientPointer.y + translation.y * scaleFrac;
 
         this.chart.view.scale = scale;
         this.chart.view.translation = {x:tx, y:ty};
 
         if (preScaleDragPointer != undefined) {
             let postScaleDragPointer = this.canvas.canvasToDOM(preScaleDragPointer);
-            this.touch.pointer.x = postScaleDragPointer.x;
-            this.touch.pointer.y = postScaleDragPointer.y;
+            this.touch.client.x = postScaleDragPointer.x;
+            this.touch.client.y = postScaleDragPointer.y;
         }
 
     }
@@ -155,6 +153,7 @@ class InteractionModule {
     onDragStart(evt) {
         this.drag.initialTranslation = Object.assign({}, this.chart.view.translation);
         this.drag.dragging = true;
+        this.drag.elements = this.chart.selectionModule.getElementsAt(this.touch);
     }
 
     /**
@@ -163,11 +162,17 @@ class InteractionModule {
      */
     onDrag(evt) {
         let pointer = this.getPointer(evt.center);
-        let diff = Utils.diffPoints(pointer, this.touch.pointer);
 
-        this.chart.canvas.DOMtoCanvas(pointer)
-
-        this.chart.view.translation = {x:this.drag.initialTranslation.x + diff.x, y:this.drag.initialTranslation.y + diff.y};
+        // If the chart doesn't handle the drag event,
+        // handle it by dragging the whole canvas around
+        if (!this.chart.handleDragEvent(pointer)) {
+            let diff = Utils.diffPoints(pointer.client, this.touch.client);
+    
+            this.chart.view.translation = {
+                x: this.drag.initialTranslation.x + diff.x, 
+                y: this.drag.initialTranslation.y + diff.y
+            };
+        }
     }
 
     /**
@@ -185,9 +190,14 @@ class InteractionModule {
     * @private
     */
     getPointer(touch) {
-        return {
+        let clientPointer = {
             x: touch.x - Utils.getAbsoluteLeft(this.div),
             y: touch.y - Utils.getAbsoluteTop(this.div)
+        };
+        let canvasPointer = this.chart.canvas.DOMtoCanvas(clientPointer);
+        return {
+            client: clientPointer,
+            canvas: canvasPointer
         };
     }
 

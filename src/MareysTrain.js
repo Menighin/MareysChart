@@ -23,15 +23,21 @@ class MareysTrain {
     set points(points) { this._points = points; }
 
     /** @property {Object} - points as a dictionary [x, y] */
-    get pointsDict() { return this._pointsDict ? this._pointsDict : this._calculatePointsDict(); }
+    get pointsDict()           { return this._pointsDict ? this._pointsDict : this._calculatePointsDict(); }
     set pointsDict(pointsDict) { this._pointsDict = pointsDict}
 
     get anchorPoints()            { return this._achorPoints ? this._anchorPoints : this._calculateAnchorPoints(); }
     set anchorPoints(achorPoints) { this._achorPoints = achorPoints; }
 
-    constructor(chart, id, group, label, schedule) {
+    get anchorPointsById() { return this._anchorPointsById ? this._anchorPointsById : this._calculateAnchorPointsById(); }
+    set anchorPointsById(dict) { this._anchorPointsById = dict; }
+
+    get virtualTrainPoints()   { return this._virtualTrainPoints; }
+    set virtualTrainPoints(vt) { this._virtualTrainPoints = vt; }
+
+    constructor(chart, id, group, label, schedule = []) {
         this.chart = chart;
-        this.options = chart.options;
+        this.options = chart ? chart.options : {};
         this.id = id;
         this.group = group;
         this.label = label;
@@ -86,7 +92,16 @@ class MareysTrain {
             trainsById[hoveredTrainId]._drawLine();
             ctx.stroke();
         }
-        
+
+        // Drawing virtual train, if exists
+        if (lastSelectedTrainId) {
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'pink';
+            trainsById[lastSelectedTrainId]._drawVirtualTrain();
+            ctx.stroke();
+        }
+
         // Drawing selected train
         if (lastSelectedTrainId) {
             ctx.beginPath();
@@ -155,6 +170,29 @@ class MareysTrain {
             ctx.lineTo(p.x, p.y);
         });
     }
+
+    /**
+     * Draws the virtual train,
+     * used when this train is being edited
+     */
+    _drawVirtualTrain() {
+        if (!this.virtualTrainPoints) return;
+
+        let ctx = this.chart.canvas.ctx;
+
+        // Defining coordinates of points
+        let points = this.virtualTrainPoints;
+       
+        // Drawing line
+        ctx.moveTo(points[0].x, points[0].y);
+
+        points.forEach((p, i) => {
+            if (i == 0) return;
+
+            ctx.lineTo(p.x, p.y);
+        });
+    }
+
 
     /**
      * Draw this train's dots
@@ -271,6 +309,22 @@ class MareysTrain {
         return this._anchorPoints;
     }
 
+    /**
+     * Calculates and creates a dictionary of MareysAnchorPoints by id for this train
+     * @param {Boolean} [force = false] - If this should be calculated even if it was done before 
+     */
+    _calculateAnchorPointsById(force = false) {
+        if (!this._anchorPointsById || force) {
+            let anchorPoints = this.anchorPoints;
+            this._anchorPointsById = {};
+            anchorPoints.forEach(a => {
+                this._anchorPointsById[a.id] = a;
+            });
+        }
+
+        return this._anchorPointsById;
+    }
+
     _linePointNearestMouse(line, x, y) {
         let lerp = (a, b, x) => a + x * (b - a);
         let dx = line.x2 - line.x1;
@@ -315,6 +369,38 @@ class MareysTrain {
         }
 
         return false;
+    }
+
+    /**
+     * Drags the anchor point to the given position, creating a virtual train
+     * @param {MareysAnchorPoint} - The Anchor point to be dragged
+     * @param {Object} pointer - The position where it should be dragged to
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates
+     */
+    draggingAnchorPoint(anchorPoint, pointer) {
+
+        // Copies this train's points in order to draw it while dragging
+        this.virtualTrainPoints = this.points.map(p => {
+            return { x: p.x, y: p.y }
+        });
+
+        // Updates the virtual train with the new schedule and point
+        if (anchorPoint.isActive) { // If it is an active anchor, there's already a point for it
+            this.virtualTrainPoints.forEach(p => {
+                if (p.x === anchorPoint.x) p.y = pointer.canvas.y;
+            });
+        } else { // Otherwise, we should create a new point (and later a new schedule)
+            let posToInsert = 0;
+
+            for (posToInsert = 0; posToInsert < this.virtualTrainPoints.length; posToInsert++)
+                if (this.virtualTrainPoints[posToInsert].x > anchorPoint.x) 
+                    break;
+
+            this.virtualTrainPoints.splice(posToInsert, 0, {x: anchorPoint.x, y: pointer.canvas.y});
+        }
+
+        anchorPoint.y = pointer.canvas.y;
     }
 }
 
