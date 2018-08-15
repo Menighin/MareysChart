@@ -133,10 +133,13 @@ class MareysTrain {
      * @returns {Array.<{time, dist}>} - A list of {time, dist} where the two trains conflict 
      */
     static getConflictsBetween(t1, t2) {
+        
+        let conflicts = [];
+        
         let schedules1 = t1.schedule;
         let schedules2 = t2.schedule;
 
-        // Comapring schedules 2 on 2 to see if they intercept
+        // Comparing schedules 2 on 2 to see if they intercept
         for (let i = 0; i < schedules1.length - 1; i++) {
             for (let j = 0; j < schedules2.length - 1; j++) {
                 
@@ -148,14 +151,14 @@ class MareysTrain {
                 };
 
                 let line2 = {
-                    x1: schedules1[j].time,
-                    y1: schedules1[j].dist,
-                    x2: schedules1[j + 1].time,
-                    y2: schedules1[j + 1].dist,
+                    x1: schedules2[j].time,
+                    y1: schedules2[j].dist,
+                    x2: schedules2[j + 1].time,
+                    y2: schedules2[j + 1].dist,
                 };
 
                 // If the lines do not cross for sure, continue
-                if (line1.x2 < line2.x1 || line1.x1 > line2.x2)
+                if (line1.x2 <= line2.x1 || line1.x1 >= line2.x2)
                     continue;
                 
                 if ((line1.y1 > line2.y1 && line1.y2 > line2.y2) || 
@@ -164,11 +167,20 @@ class MareysTrain {
 
                 // Here we know for sure the lines are crossing.
                 // Calculate the crossing point
-                console.log(`${t1.id} crosses with ${t2.id}`);
+                let slope1 = (line1.y2 - line1.y1) / (line1.x2 - line1.x1);
+                let slope2 = (line2.y2 - line2.y1) / (line2.x2 - line2.x1);
+                let line1Equation = (x) => slope1 * (x - line1.x1) + line1.y1;
 
+                let conflictTime = (slope1 * line1.x1 - slope2 * line2.x1 - line1.y1 + line2.y1) / (slope1 - slope2);
+                let conflictDist = line1Equation(conflictTime);
+
+                conflicts.push({
+                    time: conflictTime,
+                    dist: conflictDist
+                });
             }
         }
-
+        return conflicts;
     }
 
     /**

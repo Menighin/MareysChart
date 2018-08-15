@@ -156,10 +156,17 @@ class MareysChart {
     }
 
     _calculateConflictPoints() {
+        let conflictsByTrainId = {};
         for (let i = 0; i < this.data.trains.length; i++)
             for (let j = i + 1; j < this.data.trains.length; j++) {
                 let t1 = this.data.trains[i];
                 let t2 = this.data.trains[j];
+
+                if (!conflictsByTrainId[t1.id])
+                    conflictsByTrainId = {
+            
+                    }
+
                 MareysTrain.getConflictsBetween(t1, t2);
             }
     }

@@ -43,6 +43,7 @@ class Utils {
         return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     }
 
+
 }
 
 export { Utils as default };
