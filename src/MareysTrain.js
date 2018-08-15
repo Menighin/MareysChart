@@ -127,6 +127,51 @@ class MareysTrain {
     }
 
     /**
+     * Calculates the conflict points between two trains, given the options of the trains lines
+     * @param {MareysTrain} t1 
+     * @param {MareysTrain} t2
+     * @returns {Array.<{time, dist}>} - A list of {time, dist} where the two trains conflict 
+     */
+    static getConflictsBetween(t1, t2) {
+        let schedules1 = t1.schedule;
+        let schedules2 = t2.schedule;
+
+        // Comapring schedules 2 on 2 to see if they intercept
+        for (let i = 0; i < schedules1.length - 1; i++) {
+            for (let j = 0; j < schedules2.length - 1; j++) {
+                
+                let line1 = {
+                    x1: schedules1[i].time,
+                    y1: schedules1[i].dist,
+                    x2: schedules1[i + 1].time,
+                    y2: schedules1[i + 1].dist,
+                };
+
+                let line2 = {
+                    x1: schedules1[j].time,
+                    y1: schedules1[j].dist,
+                    x2: schedules1[j + 1].time,
+                    y2: schedules1[j + 1].dist,
+                };
+
+                // If the lines do not cross for sure, continue
+                if (line1.x2 < line2.x1 || line1.x1 > line2.x2)
+                    continue;
+                
+                if ((line1.y1 > line2.y1 && line1.y2 > line2.y2) || 
+                    (line1.y1 < line2.y1 && line1.y2 < line2.y2))
+                    continue;
+
+                // Here we know for sure the lines are crossing.
+                // Calculate the crossing point
+                console.log(`${t1.id} crosses with ${t2.id}`);
+
+            }
+        }
+
+    }
+
+    /**
      * Draw the anchor points for this train
      */
     _drawAnchorPoints() {
@@ -257,6 +302,10 @@ class MareysTrain {
     _calculateAnchorPoints(force = false) {
         if (!this._anchorPoints || force) {
             let axis = this.chart.axis;
+
+            // Aux to avoid creating anchor points on the same spot
+            let anchorPointIds = {};
+
             this._anchorPoints = [];
             for (let i = 0; i < this.schedule.length - 1; i++) {
                 
@@ -292,14 +341,19 @@ class MareysTrain {
                     let x = Math.round(axis.valueToXAxis(datetime.diffMinutesWith(axis.timeWindow.start)));
                     let y = Math.round(axis.valueToYAxis(dist));
 
-                    this._anchorPoints.push(new MareysAnchorPoint(
+                    let anchorPoint = new MareysAnchorPoint(
                         this.id,
                         x,
                         y,
                         datetime,
                         dist,
                         this.pointsDict[x] && this.pointsDict[x] === y 
-                    ));
+                    );
+                    
+                    if (!anchorPointIds[anchorPoint.id]) {
+                        anchorPointIds[anchorPoint.id] = 1;
+                        this._anchorPoints.push(anchorPoint);
+                    }
 
                     timeToCheck += fifteenMinutes;
                 }

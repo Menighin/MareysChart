@@ -11,12 +11,19 @@ import SelectionModule from './SelectionModule';
 
 class MareysChart {
 
-    constructor(id, stations, trains, options) {
+    get data() { return this._data; }
+    set data(data) { this._data = data; }
+    
+    get trainLines() { return this._trainLines; }
+    set trainLines(trainLines) { this._trainLines = trainLines; }
+
+    get options() { return this._options; }
+    set options(o) { this._options = o; }
+
+    constructor(id, stations, trains, trainLines, options) {
 
         // Create the prototypes
         Prototypes.bind();
-
-        this.div = id;
 
         // Creating the data object
         this.data = {
@@ -32,6 +39,7 @@ class MareysChart {
             this.data.trainsById[t.id] = t;
         });
 
+        this.trainLines = trainLines;
 
         let fifteenMinutes = 1000 * 60 * 15;
 
@@ -76,6 +84,9 @@ class MareysChart {
 
         // Initialize the canvas rendering
         this.canvasRenderer = new CanvasRenderer(id, this);
+
+        // Calculates the conflict points
+        this._calculateConflictPoints();
 
         // Start drawing
         this.canvasRenderer.initDrawing();
@@ -142,6 +153,15 @@ class MareysChart {
             let anchorPoint = elements.anchorPoints.last();
             this.data.trainsById[anchorPoint.trainId].saveVirtualTrain(anchorPoint, pointer);
         }
+    }
+
+    _calculateConflictPoints() {
+        for (let i = 0; i < this.data.trains.length; i++)
+            for (let j = i + 1; j < this.data.trains.length; j++) {
+                let t1 = this.data.trains[i];
+                let t2 = this.data.trains[j];
+                MareysTrain.getConflictsBetween(t1, t2);
+            }
     }
 }
 
