@@ -20,6 +20,12 @@ class MareysChart {
     get options() { return this._options; }
     set options(o) { this._options = o; }
 
+    get conflictsByTrainId() { return this._conflictsByTrainId; }
+    set conflictsByTrainId(cbti) { this._conflictsByTrainId = cbti; }
+
+    get conflictsByPoint() { return this._conflictsByPoint; }
+    set conflictsByPoint(count) { this._conflictsByPoint = count; }
+
     constructor(id, stations, trains, trainLines, options) {
 
         // Create the prototypes
@@ -39,7 +45,6 @@ class MareysChart {
             this.data.trainsById[t.id] = t;
         });
 
-        this.trainLines = trainLines;
 
         let fifteenMinutes = 1000 * 60 * 15;
 
@@ -66,12 +71,25 @@ class MareysChart {
             }
         };
         this.options.timeWindow.totalMinutes = (this.options.timeWindow.end.getTime() - this.options.timeWindow.start.getTime()) / (1000 * 60);
-
+        
         // Define canvas for this chart
         this.canvas = new Canvas(id, this);
-
+        
         // Defining the axis
         this.axis = new MareysAxis(id, this);
+        
+        // Save the train lines for conflict rules
+        this.trainLines = trainLines
+            .sort((a, b) => a.from - b.from)
+            .map(line => {
+                return {
+                    from: line.from,
+                    to: line.to,
+                    nLines: line.nLines,
+                    fromY: this.axis.valueToYAxis(line.from),
+                    toY: this.axis.valueToYAxis(line.to)
+                }
+            });
 
         // Define the view
         this.view = new View(id, this);
@@ -98,7 +116,25 @@ class MareysChart {
 
         // Draw the trains
         MareysTrain.drawTrains(this);
+
+        // Draw the conflicts
+        this._drawConflicts();
     } 
+
+    _drawConflicts() {
+        let ctx = this.canvas.ctx;
+
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+
+        Object.keys(this.conflictsByPoint).forEach(pointId => {
+            let conflict = this.conflictsByPoint[pointId].first();
+            ctx.moveTo(conflict.x, conflict.y);
+            ctx.arc(conflict.x, conflict.y, 10, 0, 2 * Math.PI);
+        });
+
+        ctx.fill();
+    }
 
     /**
      * Handles the mouse move event with the hover effect
@@ -155,20 +191,88 @@ class MareysChart {
         }
     }
 
+    /**
+     * Calculates the conflict points in this Marey's Chart
+     */
     _calculateConflictPoints() {
         let conflictsByTrainId = {};
+        let conflictsByPoint = {};
+
         for (let i = 0; i < this.data.trains.length; i++)
             for (let j = i + 1; j < this.data.trains.length; j++) {
                 let t1 = this.data.trains[i];
                 let t2 = this.data.trains[j];
+                
+                let conflicts = MareysTrain.getConflictsBetween(t1, t2);
 
-                if (!conflictsByTrainId[t1.id])
-                    conflictsByTrainId = {
-            
-                    }
+                if (conflicts && conflicts.any()) {
 
-                MareysTrain.getConflictsBetween(t1, t2);
+                    // Safe checks for undefined
+                    if (!conflictsByTrainId[t1.id])
+                        conflictsByTrainId[t1.id] = {};
+
+                    if (!conflictsByTrainId[t1.id][t2.id])
+                        conflictsByTrainId[t1.id][t2.id] = [];
+                        
+                    if (!conflictsByTrainId[t2.id])
+                        conflictsByTrainId[t2.id] = {};
+
+                    if (!conflictsByTrainId[t2.id][t1.id])
+                        conflictsByTrainId[t2.id][t1.id] = [];
+                
+                    // Calculating the plotting point
+                    let conflictsPoints = conflicts.map(c => {
+                        return {
+                            time: c.time,
+                            dist: c.dist,
+                            x: this.axis.valueToXAxis(c.time),
+                            y: this.axis.valueToYAxis(c.dist)
+                        };
+                    });
+
+                    // Saving conflicts by train
+                    conflictsByTrainId[t1.id][t2.id] = conflictsByTrainId[t1.id][t2.id].concat(conflictsPoints);
+                    conflictsByTrainId[t2.id][t1.id] = conflictsByTrainId[t2.id][t1.id].concat(conflictsPoints);
+
+                    // Counting conflicts by point
+                    conflictsPoints.forEach(c => {
+                        let pointId = `${c.x}-${c.y}`;
+                        if (!conflictsByPoint[pointId])
+                            conflictsByPoint[pointId] = [];
+                        conflictsByPoint[pointId].push(c);
+                    });
+
+                    // Filtering out points that are not really conflicts 
+                    // due to train lines rules
+                    Object.keys(conflictsByPoint).forEach(pointId => {
+                        let c = conflictsByPoint[pointId].first();
+
+                        // Finding the conflict rule for to see if this is a conflict indeed
+                        // e.g.: having crossing points in two-way tracks are ok
+                        let conflictRule = 1; // Default: one line only
+                        for(let i = 0; i < this.trainLines.length; i++) {
+                            let line = this.trainLines[i];
+                            if (c.dist >= line.from && c.dist <= line.to) {
+                                conflictRule = line.nLines;
+                                break;
+                            }
+                        }
+
+                        // If the conflict rule says it's ok to have this conflict,
+                        // delete it from the list of conflicts
+                        if (conflictsByPoint[pointId] <= conflictRule)
+                            delete conflictsByPoint[pointId];
+
+                    });
+
+                    
+
+                }
+
             }
+
+        this.conflictsByTrainId = conflictsByTrainId;
+        this.conflictsByPoint = conflictsByPoint;
     }
 }
 

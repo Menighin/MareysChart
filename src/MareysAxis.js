@@ -170,7 +170,8 @@ class MareysAxis {
      * @returns {Number} - The value in the X axis
      */
     valueToXAxis(value) {
-        return this.drawing.area.x1 + this.drawing.xFactor * value;
+        value = new Date(value);
+        return Math.round(this.drawing.area.x1 + this.drawing.xFactor * value.diffMinutesWith(this.timeWindow.start));
     }
     
     /**
@@ -179,7 +180,7 @@ class MareysAxis {
      * @returns {Number} - The value in the Y axis
      */
     valueToYAxis(value) {
-        return this.drawing.area.y1 + this.drawing.yFactor * value;
+        return Math.round(this.drawing.area.y1 + this.drawing.yFactor * value);
     }
     
     /**

@@ -282,7 +282,7 @@ class MareysTrain {
             this._points = [];
             this.schedule.forEach(s => {
                 this._points.push({
-                    x: Math.round(axis.valueToXAxis(s.time.diffMinutesWith(axis.timeWindow.start))), 
+                    x: Math.round(axis.valueToXAxis(s.time)), 
                     y: Math.round(axis.valueToYAxis(s.dist))
                 });
             });
@@ -350,7 +350,7 @@ class MareysTrain {
                 while (timeToCheck <= p2.xMillis) {
                     let datetime = new Date(timeToCheck);
                     let dist = lineEquation(timeToCheck);
-                    let x = Math.round(axis.valueToXAxis(datetime.diffMinutesWith(axis.timeWindow.start)));
+                    let x = Math.round(axis.valueToXAxis(datetime));
                     let y = Math.round(axis.valueToYAxis(dist));
 
                     let anchorPoint = new MareysAnchorPoint(
