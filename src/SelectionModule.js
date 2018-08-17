@@ -50,6 +50,15 @@ class SelectionModule {
             }
         }
 
+        // Show tooltip if it should
+        if (this.chart.tooltip) {
+            if (hoveredAnchorPoints.any())
+                this.chart.tooltip.show(hoveredAnchorPoints.first(), pointer);
+            else if (hoveredTrains.any())
+                this.chart.tooltip.show(hoveredTrains.first(), pointer);
+            else
+                this.chart.tooltip.hide();
+        }
     }
 
     /**

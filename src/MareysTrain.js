@@ -507,6 +507,10 @@ class MareysTrain {
 
         delete this.virtualTrainPoints;
     }
+
+    getTooltipInfo(pointer) {
+        return `Train ${this.id} tooltip`;
+    }
 }
 
 export default MareysTrain;

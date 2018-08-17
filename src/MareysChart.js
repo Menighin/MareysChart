@@ -6,10 +6,14 @@ import MareysAxis from './MareysAxis';
 import Prototypes from './Prototypes';
 import MareysTrain from './MareysTrain';
 import SelectionModule from './SelectionModule';
+import Tooltip from './Tooltip';
 
 'user strict';
 
 class MareysChart {
+
+    get container() { return this._container; }
+    set container(c) { this._container = c; }
 
     get data() { return this._data; }
     set data(data) { this._data = data; }
@@ -27,6 +31,8 @@ class MareysChart {
     set conflictsByPoint(count) { this._conflictsByPoint = count; }
 
     constructor(id, stations, trains, trainLines, options) {
+
+        this.container = document.getElementById(id);
 
         // Create the prototypes
         Prototypes.bind();
@@ -104,6 +110,9 @@ class MareysChart {
 
         // Calculates the conflict points
         this._calculateConflictPoints();
+
+        // Creates the tooltip
+        this.tooltip = new Tooltip(this);
 
         // Start drawing
         this.canvasRenderer.initDrawing();
@@ -267,9 +276,9 @@ class MareysChart {
             if (conflictsByPoint[pointId].length < conflictRule)
                 delete conflictsByPoint[pointId];
             else {
-                console.log(conflictsByPoint[pointId]);
-                console.log(`Rule: ${conflictRule} | Conflicts: ${conflictsByPoint[pointId].length}`);
-                console.log("-------------");
+                // console.log(conflictsByPoint[pointId]);
+                // console.log(`Rule: ${conflictRule} | Conflicts: ${conflictsByPoint[pointId].length}`);
+                // console.log("-------------");
             }
 
         });
