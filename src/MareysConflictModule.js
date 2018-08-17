@@ -1,6 +1,7 @@
 'use strict';
 
 import MareysTrain from './MareysTrain';
+import MareysConflictPoint from './MareysConflictPoint';
 
 /**
  * Responsible for calculating, drawing and interacting with conflict points
@@ -52,14 +53,7 @@ class MareysConflictModule {
                 
                     // Calculating the plotting point
                     let conflictsPoints = conflicts.map(c => {
-                        return {
-                            t1: t1.id,
-                            t2: t2.id,
-                            time: c.time,
-                            dist: c.dist,
-                            x: this.chart.axis.valueToXAxis(c.time),
-                            y: this.chart.axis.valueToYAxis(c.dist)
-                        };
+                        return new MareysConflictPoint(this.chart, c.time, c.dist, t1.id, t2.id);
                     });
 
                     // Saving conflicts by train
@@ -68,10 +62,11 @@ class MareysConflictModule {
 
                     // Counting conflicts by point
                     conflictsPoints.forEach(c => {
-                        let pointId = `${c.x}-${c.y}`;
+                        let pointId = c.id;
                         if (!conflictsByPoint[pointId])
-                            conflictsByPoint[pointId] = [];
-                        conflictsByPoint[pointId].push(c);
+                            conflictsByPoint[pointId] = c;
+                        else
+                            conflictsByPoint[pointId].addTrainId(c);
                     });
                 }
             }
@@ -80,14 +75,14 @@ class MareysConflictModule {
         // Filtering out points that are not really conflicts 
         // due to train lines rules
         Object.keys(conflictsByPoint).forEach(pointId => {
-            let c = conflictsByPoint[pointId].first();
+            let c = conflictsByPoint[pointId];
             
             // Finding the conflict rule for to see if this is a conflict indeed
             // e.g.: having crossing points in two-way tracks are ok
             let conflictRule = 1; // Default: one line only
             for(let i = 0; i < this.chart.trainLines.length; i++) {
                 let line = this.chart.trainLines[i];
-                if (c.dist >= line.from && c.dist <= line.to) {
+                if (c.distance >= line.from && c.distance <= line.to) {
                     conflictRule = line.nLines;
                     break;
                 }
@@ -95,7 +90,7 @@ class MareysConflictModule {
             
             // If the conflict rule says it's ok to have this conflict,
             // delete it from the list of conflicts
-            if (conflictsByPoint[pointId].length < conflictRule)
+            if (c.numConflicts <= conflictRule)
                 delete conflictsByPoint[pointId];
             else {
                 // console.log(conflictsByPoint[pointId]);
@@ -119,7 +114,7 @@ class MareysConflictModule {
         ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
 
         Object.keys(this.conflictsByPoint).forEach(pointId => {
-            let conflict = this.conflictsByPoint[pointId].first();
+            let conflict = this.conflictsByPoint[pointId];
             ctx.moveTo(conflict.x, conflict.y);
             ctx.arc(conflict.x, conflict.y, 10, 0, 2 * Math.PI);
         });
