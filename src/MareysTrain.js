@@ -161,11 +161,6 @@ class MareysTrain {
                 if (line1.x2 <= line2.x1 || line1.x1 >= line2.x2)
                     continue;
                 
-                if ((line1.y1 > line2.y1 && line1.y2 > line2.y2) || 
-                    (line1.y1 < line2.y1 && line1.y2 < line2.y2))
-                    continue;
-
-                // Here we know for sure the lines are crossing.
                 // Calculate the crossing point
                 let slope1 = (line1.y2 - line1.y1) / (line1.x2 - line1.x1);
                 let slope2 = (line2.y2 - line2.y1) / (line2.x2 - line2.x1);
@@ -174,10 +169,17 @@ class MareysTrain {
                 let conflictTime = (slope1 * line1.x1 - slope2 * line2.x1 - line1.y1 + line2.y1) / (slope1 - slope2);
                 let conflictDist = line1Equation(conflictTime);
 
+                // Checks if the crossing point belongs to both lines
+                if (!(conflictTime >= line1.x1 && conflictTime <= line1.x2 &&
+                    conflictTime >= line2.x1 && conflictTime <= line2.x2))
+                    continue;
+
                 conflicts.push({
                     time: conflictTime,
                     dist: conflictDist
                 });
+
+                // if (conflictDist < 0) debugger;
             }
         }
         return conflicts;
@@ -410,9 +412,7 @@ class MareysTrain {
      */
     intersectsWith(pointer) {
         let points = this.points;
-
         if (points.length <= 1) return false;
-
         for (let i = 0; i < points.length - 1; i++) {
 
             let line = {
@@ -431,7 +431,9 @@ class MareysTrain {
             let dy = pointer.canvas.y - linePoint.y;
             let distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
 
-            if (distance <= MOUSE_DISTANCE_TOLERANCE) return true;
+            if (distance <= MOUSE_DISTANCE_TOLERANCE) { 
+                return true;
+            }
         }
 
         return false;

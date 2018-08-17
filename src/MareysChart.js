@@ -45,7 +45,6 @@ class MareysChart {
             this.data.trainsById[t.id] = t;
         });
 
-
         let fifteenMinutes = 1000 * 60 * 15;
 
         let start = new Date();
@@ -244,26 +243,26 @@ class MareysChart {
 
                     // Filtering out points that are not really conflicts 
                     // due to train lines rules
-                    Object.keys(conflictsByPoint).forEach(pointId => {
-                        let c = conflictsByPoint[pointId].first();
+                    // Object.keys(conflictsByPoint).forEach(pointId => {
+                    //     let c = conflictsByPoint[pointId].first();
 
-                        // Finding the conflict rule for to see if this is a conflict indeed
-                        // e.g.: having crossing points in two-way tracks are ok
-                        let conflictRule = 1; // Default: one line only
-                        for(let i = 0; i < this.trainLines.length; i++) {
-                            let line = this.trainLines[i];
-                            if (c.dist >= line.from && c.dist <= line.to) {
-                                conflictRule = line.nLines;
-                                break;
-                            }
-                        }
+                    //     // Finding the conflict rule for to see if this is a conflict indeed
+                    //     // e.g.: having crossing points in two-way tracks are ok
+                    //     let conflictRule = 1; // Default: one line only
+                    //     for(let i = 0; i < this.trainLines.length; i++) {
+                    //         let line = this.trainLines[i];
+                    //         if (c.dist >= line.from && c.dist <= line.to) {
+                    //             conflictRule = line.nLines;
+                    //             break;
+                    //         }
+                    //     }
 
-                        // If the conflict rule says it's ok to have this conflict,
-                        // delete it from the list of conflicts
-                        if (conflictsByPoint[pointId] <= conflictRule)
-                            delete conflictsByPoint[pointId];
+                    //     // If the conflict rule says it's ok to have this conflict,
+                    //     // delete it from the list of conflicts
+                    //     if (conflictsByPoint[pointId] <= conflictRule)
+                    //         delete conflictsByPoint[pointId];
 
-                    });
+                    // });
 
                     
 

@@ -24,9 +24,9 @@ class SelectionModule {
      * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates} pointer 
      */
     handleHoverEvent(pointer) {
-        let elementsAtPonter = this.getElementsAt(pointer);
-        let hoveredTrains = elementsAtPonter.trains;
-        let hoveredAnchorPoints = elementsAtPonter.anchorPoints;
+        let elementsAtPointer = this.getElementsAt(pointer);
+        let hoveredTrains = elementsAtPointer.trains;
+        let hoveredAnchorPoints = elementsAtPointer.anchorPoints;
 
         // Setting the right mouse pointer
         if (hoveredAnchorPoints.any())
@@ -84,7 +84,7 @@ class SelectionModule {
         this.chart.data.trains.forEach(t => {
             if (t.intersectsWith(pointer)) {
                 elements.trains.push(t);
-
+                
                 if (this.selectedTrainsIds && this.selectedTrainsIds.last() == t.id) {
                     t.anchorPoints.forEach(a => {
                         if (a.isMouseOver(pointer))
