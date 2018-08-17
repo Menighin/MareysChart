@@ -144,7 +144,7 @@ let trains = [];
 // ];
 
 
-for (let i = 0; i < 80; i++) {
+for (let i = 0; i < 5; i++) {
     let train = {
         id: `t${i}`,
         group: `g${i}`,

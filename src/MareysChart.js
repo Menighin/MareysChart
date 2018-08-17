@@ -197,7 +197,7 @@ class MareysChart {
         let conflictsByTrainId = {};
         let conflictsByPoint = {};
 
-        for (let i = 0; i < this.data.trains.length; i++)
+        for (let i = 0; i < this.data.trains.length; i++) {
             for (let j = i + 1; j < this.data.trains.length; j++) {
                 let t1 = this.data.trains[i];
                 let t2 = this.data.trains[j];
@@ -222,6 +222,8 @@ class MareysChart {
                     // Calculating the plotting point
                     let conflictsPoints = conflicts.map(c => {
                         return {
+                            t1: t1.id,
+                            t2: t2.id,
                             time: c.time,
                             dist: c.dist,
                             x: this.axis.valueToXAxis(c.time),
@@ -240,36 +242,38 @@ class MareysChart {
                             conflictsByPoint[pointId] = [];
                         conflictsByPoint[pointId].push(c);
                     });
-
-                    // Filtering out points that are not really conflicts 
-                    // due to train lines rules
-                    // Object.keys(conflictsByPoint).forEach(pointId => {
-                    //     let c = conflictsByPoint[pointId].first();
-
-                    //     // Finding the conflict rule for to see if this is a conflict indeed
-                    //     // e.g.: having crossing points in two-way tracks are ok
-                    //     let conflictRule = 1; // Default: one line only
-                    //     for(let i = 0; i < this.trainLines.length; i++) {
-                    //         let line = this.trainLines[i];
-                    //         if (c.dist >= line.from && c.dist <= line.to) {
-                    //             conflictRule = line.nLines;
-                    //             break;
-                    //         }
-                    //     }
-
-                    //     // If the conflict rule says it's ok to have this conflict,
-                    //     // delete it from the list of conflicts
-                    //     if (conflictsByPoint[pointId] <= conflictRule)
-                    //         delete conflictsByPoint[pointId];
-
-                    // });
-
-                    
-
                 }
+            }
+        }
 
+        // Filtering out points that are not really conflicts 
+        // due to train lines rules
+        Object.keys(conflictsByPoint).forEach(pointId => {
+            let c = conflictsByPoint[pointId].first();
+            
+            // Finding the conflict rule for to see if this is a conflict indeed
+            // e.g.: having crossing points in two-way tracks are ok
+            let conflictRule = 1; // Default: one line only
+            for(let i = 0; i < this.trainLines.length; i++) {
+                let line = this.trainLines[i];
+                if (c.dist >= line.from && c.dist <= line.to) {
+                    conflictRule = line.nLines;
+                    break;
+                }
+            }
+            
+            // If the conflict rule says it's ok to have this conflict,
+            // delete it from the list of conflicts
+            if (conflictsByPoint[pointId].length < conflictRule)
+                delete conflictsByPoint[pointId];
+            else {
+                console.log(conflictsByPoint[pointId]);
+                console.log(`Rule: ${conflictRule} | Conflicts: ${conflictsByPoint[pointId].length}`);
+                console.log("-------------");
             }
 
+        });
+        
         this.conflictsByTrainId = conflictsByTrainId;
         this.conflictsByPoint = conflictsByPoint;
     }
