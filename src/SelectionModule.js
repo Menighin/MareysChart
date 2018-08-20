@@ -87,7 +87,8 @@ class SelectionModule {
     getElementsAt(pointer) {
         let elements = {
             trains: [],
-            anchorPoints: []
+            anchorPoints: [],
+            conflictPoints: this.chart.conflictModule.getConflictsAt(pointer)
         };
         
         this.chart.data.trains.forEach(t => {
@@ -97,7 +98,7 @@ class SelectionModule {
                 if (this.selectedTrainsIds && this.selectedTrainsIds.last() == t.id) {
                     t.anchorPoints.forEach(a => {
                         if (a.isMouseOver(pointer))
-                        elements.anchorPoints.push(a);
+                            elements.anchorPoints.push(a);
                     });
                 }
             }
@@ -118,6 +119,10 @@ class SelectionModule {
 
     getAnchorPointsAt(pointer) {
         return this.getElementsAt(pointer).anchorPoints;
+    }
+
+    getConflictPointsAt(pointer) {
+        return this.getElementsAt(pointer).conflictPoints;
     }
 }
 

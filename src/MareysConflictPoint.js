@@ -1,5 +1,9 @@
 'use strict';
 
+import Utils from './Utils';
+
+const CONFLICT_RADIUS = 10;
+
 class MareysConflictPoint {
 
     get id()  { return this._id; }
@@ -46,6 +50,19 @@ class MareysConflictPoint {
         else 
             this.trainsIds[id] = 1;
     }
+
+    /**
+     * Returns wheter the mouse is hovering this anchor point
+     * @param {Object} pointer - The pointer object
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates
+     * @returns {Boolean} - Whether mouse is hovering this point
+     */
+    isMouseOver(pointer) {
+        let distToPoint = Utils.getDistanceBetweenPoints(pointer.canvas, {x: this.x, y: this.y});
+        return distToPoint <= CONFLICT_RADIUS + 3;
+    }
+
 }
 
 export default MareysConflictPoint;

@@ -2,11 +2,16 @@
 
 import MareysTrain from './MareysTrain';
 import MareysConflictPoint from './MareysConflictPoint';
+// import CONFLICT_RADIUS from './MareysConflictPoint';
+const CONFLICT_RADIUS = 10;
 
 /**
  * Responsible for calculating, drawing and interacting with conflict points
  */
 class MareysConflictModule {
+
+    get conflicts()  { return this._conflicts; }
+    set conflicts(c) { this._conflicts = c; }
 
     get conflictsByTrainId() { return this._conflictsByTrainId; }
     set conflictsByTrainId(cbti) { this._conflictsByTrainId = cbti; }
@@ -102,6 +107,7 @@ class MareysConflictModule {
         
         this.conflictsByTrainId = conflictsByTrainId;
         this.conflictsByPoint = conflictsByPoint;
+        this.conflicts = Object.values(conflictsByPoint);
     }
 
     /**
@@ -113,17 +119,31 @@ class MareysConflictModule {
         ctx.beginPath();
         ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
 
-        Object.keys(this.conflictsByPoint).forEach(pointId => {
-            let conflict = this.conflictsByPoint[pointId];
+        this.conflicts.forEach(conflict => {
             ctx.moveTo(conflict.x, conflict.y);
-            ctx.arc(conflict.x, conflict.y, 10, 0, 2 * Math.PI);
+            ctx.arc(conflict.x, conflict.y, CONFLICT_RADIUS, 0, 2 * Math.PI);
         });
 
         ctx.fill();
     }
 
+    /**
+     * Returns a list of conflicts located on the pointer
+     * @param {Object} pointer - The pointer object
+     * @param {Object} pointer.client - The coordinates {x, y} on the div
+     * @param {Object} pointer.canvas - The coordinates {x, y} translated to canvas coordinates
+     * @returns {Array.<MareysConflictPoint>} - The trains that are on this coordinates
+     */
+    getConflictsAt(pointer) {
+        let result = [];
 
-
+        this.conflicts.forEach(c => {
+            if (c.isMouseOver(pointer))
+                result.push(c);
+        });
+        
+        return result;
+    }
 }
 
 export default MareysConflictModule;
