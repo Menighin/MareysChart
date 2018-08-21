@@ -122,13 +122,6 @@ class InteractionModule {
             scale = 10;
         }
 
-        let preScaleDragPointer = undefined;
-        if (this.drag !== undefined) {
-            if (this.drag.dragging === true) {
-                preScaleDragPointer = this.touch.canvas;
-            }
-        }
-
         let translation = this.chart.view.translation;
 
         let scaleFrac = scale / scaleOld;
@@ -137,13 +130,6 @@ class InteractionModule {
 
         this.chart.view.scale = scale;
         this.chart.view.translation = {x:tx, y:ty};
-
-        if (preScaleDragPointer != undefined) {
-            let postScaleDragPointer = this.canvas.canvasToDOM(preScaleDragPointer);
-            this.touch.client.x = postScaleDragPointer.x;
-            this.touch.client.y = postScaleDragPointer.y;
-        }
-
     }
 
     /**

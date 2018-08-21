@@ -151,6 +151,7 @@ for (let i = 0; i < 5; i++) {
         schedule: []
     };
 
+    
     stations.forEach(s => {
         let time = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
         if (time % fifteenMinutes !== 0)

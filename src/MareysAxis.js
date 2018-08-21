@@ -112,7 +112,7 @@ class MareysAxis {
         // Generating lines & drawing labels
         for (let i = 0; i <= this.timeWindow.totalMinutes; i++) {
 
-            let x = Math.round(this.largestStation.width + Y_AXIS_WIDTH_PAN + i * this.drawing.xFactor);
+            let x = Math.round(this.drawing.area.x1 + i * this.drawing.xFactor);
 
             if (i % 15 == 0 && i % 60 !== 0) {
                 lines.push({
