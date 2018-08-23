@@ -52,6 +52,13 @@ class MareysAxis {
             return previous.width > station.width ? previous : station
         }, {length: 0, width: 0});
 
+        // Cap the width and height in order to be visible
+        if (width < this.timeWindow.totalMinutes * 3)
+            width = this.timeWindow.totalMinutes * 3;
+
+        if (height < this.stations.length * 20)
+            height = this.stations.length * 20;
+
         this.drawing = {
             area: {
                 y1: Y_AXIS_TOP_MARGIN - 3,
@@ -199,7 +206,7 @@ class MareysAxis {
      */
     xAxisToValue(x) {
         return (x - this.drawing.area.x1) / this.drawing.xFactor; 
-     }
+    }
 
 }
 

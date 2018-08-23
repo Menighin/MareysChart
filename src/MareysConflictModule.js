@@ -24,7 +24,7 @@ class MareysConflictModule {
         this.chart = chart;
 
         // Calculate conflicts points
-        this._calculateConflictPoints();
+        //this._calculateConflictPoints();
     }
 
     /**
@@ -135,6 +135,9 @@ class MareysConflictModule {
      * @returns {Array.<MareysConflictPoint>} - The trains that are on this coordinates
      */
     getConflictsAt(pointer) {
+
+        if (!this.conflicts) return [];
+
         let result = [];
 
         this.conflicts.forEach(c => {

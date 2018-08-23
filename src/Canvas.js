@@ -18,7 +18,7 @@ class Canvas {
      * @private
      */
     _XconvertDOMtoCanvas(x) {
-        return (x - this.chart.view.translation.x) / this.chart.view.scale;
+        return (x - this.chart.camera.translation.x) / this.chart.camera.scale;
     }
 
     /**
@@ -29,7 +29,7 @@ class Canvas {
      * @private
      */
     _XconvertCanvasToDOM(x) {
-        return x * this.chart.view.scale + this.chart.view.translation.x;
+        return x * this.chart.camera.scale + this.chart.camera.translation.x;
     }
 
     /**
@@ -40,7 +40,7 @@ class Canvas {
      * @private
      */
     _YconvertDOMtoCanvas(y) {
-        return (y - this.chart.view.translation.y) / this.chart.view.scale;
+        return (y - this.chart.camera.translation.y) / this.chart.camera.scale;
     }
 
     /**
@@ -51,16 +51,15 @@ class Canvas {
      * @private
      */
     _YconvertCanvasToDOM(y) {
-        return y * this.chart.view.scale + this.chart.view.translation.y;
+        return y * this.chart.camera.scale + this.chart.camera.translation.y;
     }
-
 
     /**
      * Converts a given point in the canvas to a point in DOM
      * @param {point} pos
      * @returns {point}
      */
-    canvasToDOM (pos) {
+    canvasToDOM(pos) {
         return {x: this._XconvertCanvasToDOM(pos.x), y: this._YconvertCanvasToDOM(pos.y)};
     }
 
@@ -69,8 +68,14 @@ class Canvas {
      * @param {point} pos
      * @returns {point}
      */
-    DOMtoCanvas (pos) {
+    DOMtoCanvas(pos) {
         return {x: this._XconvertDOMtoCanvas(pos.x), y: this._YconvertDOMtoCanvas(pos.y)};
+    }
+
+    isPointVisible(point) {
+        let domPoint = this.canvasToDOM(point);
+
+        return domPoint.x >= 0 && domPoint.y >= 0 && domPoint.x <= this.chart.camera.viewport.w && domPoint.y <= this.chart.camera.viewport.h;
     }
 
 }

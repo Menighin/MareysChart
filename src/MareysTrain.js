@@ -215,19 +215,36 @@ class MareysTrain {
      * Draws this train's lines
      */
     _drawLine() {
-        let ctx = this.chart.canvas.ctx;
+        let canvas = this.chart.canvas;
+        let ctx = canvas.ctx;
 
         // Defining coordinates of points
         let points = this.points;
+
+        let firstVisiblePoint = undefined;
+        for (let i = 0; i < points.length; i++) {
+            if (canvas.isPointVisible(points[i])) {
+                firstVisiblePoint = i;
+                break;
+            }
+        }
+
+        // If there is no visible point, there's nothing to draw for this line
+        if (firstVisiblePoint === undefined) return;
        
         // Drawing line
-        ctx.moveTo(points[0].x, points[0].y);
+        // Move cursor to the point right before the first visible
+        let startPoint = firstVisiblePoint > 0 ? firstVisiblePoint - 1 : 0;
+        ctx.moveTo(points[startPoint].x, points[startPoint].y);
 
-        points.forEach((p, i) => {
-            if (i == 0) return;
-
+        for (let i = firstVisiblePoint; i < points.length; i++) {
+            let p = points[i];
             ctx.lineTo(p.x, p.y);
-        });
+
+            // If it already drawn a not visible point, stop
+            if (!canvas.isPointVisible(p))
+                break;
+        }
     }
 
     /**

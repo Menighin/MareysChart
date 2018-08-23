@@ -1,7 +1,7 @@
 import CanvasRenderer from './CanvasRenderer';
 import InteractionModule from './InteractionModule';
 import Canvas from './Canvas';
-import View from './View';
+import CameraModule from './CameraModule';
 import MareysAxis from './MareysAxis';
 import Prototypes from './Prototypes';
 import MareysTrain from './MareysTrain';
@@ -26,7 +26,6 @@ class MareysChart {
     set options(o) { this._options = o; }
 
     constructor(id, stations, trains, trainLines, options) {
-
         this.container = document.getElementById(id);
 
         // Create the prototypes
@@ -91,8 +90,8 @@ class MareysChart {
                 }
             });
 
-        // Define the view
-        this.view = new View(id, this);
+        // Define the camera
+        this.camera = new CameraModule(id, this);
 
         // Define selection module to handle selections
         this.selectionModule = new SelectionModule(id, this);
@@ -121,7 +120,7 @@ class MareysChart {
         MareysTrain.drawTrains(this);
 
         // Draw the conflicts
-        this.conflictModule.draw();
+        //this.conflictModule.draw();
     } 
 
     /**

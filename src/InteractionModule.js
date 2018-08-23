@@ -87,7 +87,7 @@ class InteractionModule {
         // and negative, if wheel was scrolled down.
         if (delta !== 0) {
             // calculate the new scale
-            let scale = this.chart.view.scale;
+            let scale = this.chart.camera.scale;
             let zoom = delta * (this.chart.options.interaction.zoomSpeed / 10);
             if (delta < 0) {
                 zoom = zoom / (1 - zoom);
@@ -114,7 +114,7 @@ class InteractionModule {
 
         let clientPointer = pointer.client;
 
-        let scaleOld = this.chart.view.scale;
+        let scaleOld = this.chart.camera.scale;
         if (scale < 0.00001) {
             scale = 0.00001;
         }
@@ -122,14 +122,14 @@ class InteractionModule {
             scale = 10;
         }
 
-        let translation = this.chart.view.translation;
+        let translation = this.chart.camera.translation;
 
         let scaleFrac = scale / scaleOld;
         let tx = (1 - scaleFrac) * clientPointer.x + translation.x * scaleFrac;
         let ty = (1 - scaleFrac) * clientPointer.y + translation.y * scaleFrac;
 
-        this.chart.view.scale = scale;
-        this.chart.view.translation = {x:tx, y:ty};
+        this.chart.camera.scale = scale;
+        this.chart.camera.translation = {x:tx, y:ty};
     }
 
     /**
@@ -137,7 +137,7 @@ class InteractionModule {
      * @param {Event} evt 
      */
     onDragStart(evt) {
-        this.drag.initialTranslation = Object.assign({}, this.chart.view.translation);
+        this.drag.initialTranslation = Object.assign({}, this.chart.camera.translation);
         this.drag.dragging = true;
         this.drag.elements = this.chart.selectionModule.getElementsAt(this.touch);
     }
@@ -154,7 +154,7 @@ class InteractionModule {
         if (!this.chart.handleDragEvent(pointer)) {
             let diff = Utils.diffPoints(pointer.client, this.touch.client);
     
-            this.chart.view.translation = {
+            this.chart.camera.translation = {
                 x: this.drag.initialTranslation.x + diff.x, 
                 y: this.drag.initialTranslation.y + diff.y
             };

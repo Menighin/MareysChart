@@ -2,16 +2,16 @@ import MareysChart from './MareysChart';
 
 let stations = [
     {
-        label: 'Station Alpha',
-        dist: 20
+        label: 'Station Zero',
+        dist: 0
     },
     {
-        label: 'Station Beta',
+        label: 'Station Alpha',
         dist: 15
     },
     {
-        label: 'Station Zero',
-        dist: 0
+        label: 'Station Beta',
+        dist: 20
     },
     {
         label: 'Station Charlie',
@@ -33,7 +33,64 @@ let stations = [
         label: 'Station Golf',
         dist: 120
     },
+    {
+        label: 'Station Hotel',
+        dist: 130
+    },
+    {
+        label: 'Station India',
+        dist: 140
+    },
+    {
+        label: 'Station Juliett',
+        dist: 155
+    },
+    {
+        label: 'Station Kilo',
+        dist: 170
+    },
+    {
+        label: 'Station Lima',
+        dist: 201
+    },
+    {
+        label: 'Station Mike',
+        dist: 220
+    },
+    {
+        label: 'Station November',
+        dist: 230
+    },
+    {
+        label: 'Station Oscar',
+        dist: 240
+    },
+    {
+        label: 'Station Papa',
+        dist: 255
+    },
+    {
+        label: 'Station Quebec',
+        dist: 270
+    },
+    {
+        label: 'Station Romeo',
+        dist: 290
+    },
 ];
+
+
+stations = [];
+let distAux = 0;
+for (let i = 0; i < 600; i++) {
+    stations.push({
+        label: `Station ${i}`,
+        dist: distAux
+    });
+    if (i % 3 == 0) distAux += 30;
+    else if (i % 2 == 0) distAux += 20;
+    else distAux += 10;
+}
 
 
 let fifteenMinutes = 1000 * 60 * 15;
@@ -143,27 +200,43 @@ let trains = [];
 //     }
 // ];
 
+let currTime = new Date(start.getTime());
 
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 200; i++) {
     let train = {
         id: `t${i}`,
         group: `g${i}`,
         schedule: []
     };
 
-    
-    stations.forEach(s => {
-        let time = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-        if (time % fifteenMinutes !== 0)
-            time = new Date(time.getTime() + (fifteenMinutes - time.getTime() % fifteenMinutes));
+    if (i % 2 === 0) {
+        stations.forEach((s, j) => {
+            let time = new Date(currTime.getTime() + (1000 * 60 * 5 * j));
 
-        train.schedule.push({
-            time: time,
-            dist: s.dist
+            train.schedule.push({
+                time: time,
+                dist: s.dist
+            });
         });
-    });
+        if (i == 0) console.log(train);
+    } 
+    else {
+        for (let j = stations.length - 1, k = 0; j >= 0; j--, k++) {
+            let s = stations[j];
+
+            let time = new Date(currTime.getTime() + (1000 * 60 * 5 * k));
+
+            train.schedule.push({
+                time: time,
+                dist: s.dist
+            });
+        }
+        currTime = new Date(start.getTime() + 1000 * 60 * 5 * (i + 1));
+        // if (currTime.getTime() + 1000 * 60 * 2 * stations.length > end.getTime()) currTime = new Date(start.getTime() + 1000 * 60 * 5 * (i + 1));
+    }
 
     trains.push(train);
+    
 }
 
 let trainLines = [
