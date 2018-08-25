@@ -81,7 +81,8 @@ class MareysAxis {
      * Draw the Y Axis, the stations
      */
     _drawStations() {
-        let ctx = this.chart.canvas.ctx;
+        let canvas = this.chart.canvas;
+        let ctx = canvas.ctx;
 
         ctx.font = STATION_FONTS;
         ctx.lineWidth = 1;
@@ -93,7 +94,7 @@ class MareysAxis {
             let y = Math.round(Y_AXIS_TOP_MARGIN + s.dist * this.drawing.yFactor);
             
             // Draw label
-            ctx.fillText(s.label, Y_AXIS_LEFT_MARGIN, y);
+            ctx.fillText(s.label, -this.chart.camera.translation.x / this.chart.camera.scale + 5, y);
 
             // Draw the horizontal lines for station
             ctx.moveTo(this.drawing.area.x1, y - 3);

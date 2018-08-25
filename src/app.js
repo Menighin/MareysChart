@@ -82,7 +82,7 @@ let stations = [
 
 stations = [];
 let distAux = 0;
-for (let i = 0; i < 600; i++) {
+for (let i = 0; i < 200; i++) {
     stations.push({
         label: `Station ${i}`,
         dist: distAux
@@ -105,100 +105,6 @@ let end = new Date(start.getTime() + 1000 * 60 * 60 * 24);
 
 let trains = [];
 
-//trains = [
-    // {
-    //     id: 't1',
-    //     group: 'g1',
-    //     schedule: [
-    //         {
-    //             time: start,
-    //             dist: 0
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 3),
-    //             dist: 55
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 6),
-    //             dist: 100
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 9),
-    //             dist: 23
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 11),
-    //             dist: 1
-    //         },
-    //     ]
-    // },
-    // {
-    //     id: 't2',
-    //     group: 'g2',
-    //     schedule: [
-    //         {
-    //             time: start,
-    //             dist: 100
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 3),
-    //             dist: 75
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 6),
-    //             dist: 0
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 8),
-    //             dist: 66
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 10),
-    //             dist: 123
-    //         },
-    //     ]
-    // },
-    // {
-    //     id: 't3',
-    //     group: 'g2',
-    //     schedule: [
-    //         {
-    //             time: start,
-    //             dist: 64
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 3),
-    //             dist: 64
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 6),
-    //             dist: 64
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 8),
-    //             dist: 64
-    //         },
-    //         {
-    //             time: new Date(start.getTime() + 1000 * 60 * 60 * 10),
-    //             dist: 64
-    //         },
-    //     ]
-    // }
-// ];
-
-
-// trains = [
-//     {
-//         id: 't1',
-//         group: 'g1',
-//         schedule: [{"time": new Date("2018-08-16T14:15:00.000Z"),"dist":120},{"time": new Date("2018-08-16T15:00:00.000Z"),"dist":55},{"time": new Date("2018-08-16T15:45:00.000Z"),"dist":20},{"time": new Date("2018-08-16T15:45:00.000Z"),"dist":33},{"time": new Date("2018-08-17T03:30:00.000Z"),"dist":63},{"time": new Date("2018-08-17T04:30:00.000Z"),"dist":15},{"time": new Date("2018-08-17T08:00:00.000Z"),"dist":100},{"time": new Date("2018-08-17T11:30:00.000Z"),"dist":0}]
-//     },
-//     {
-//         id: 't2',
-//         group: 'g2',
-//         schedule: [{"time": new Date("2018-08-16T19:15:00.000Z"),"dist":20},{"time": new Date("2018-08-17T00:30:00.000Z"),"dist":63},{"time": new Date("2018-08-17T02:15:00.000Z"),"dist":120},{"time": new Date("2018-08-17T03:00:00.000Z"),"dist":33},{"time": new Date("2018-08-17T05:15:00.000Z"),"dist":55},{"time": new Date("2018-08-17T05:15:00.000Z"),"dist":100},{"time": new Date("2018-08-17T08:45:00.000Z"),"dist":15},{"time": new Date("2018-08-17T13:30:00.000Z"),"dist":0}]
-//     }
-// ];
 
 let currTime = new Date(start.getTime());
 
