@@ -113,11 +113,14 @@ class MareysChart {
     }
 
     draw() {
-        // Draw the axis
-        this.axis.draw();
+        // Draw the axis grid before drawing the trains
+        this.axis.drawGrid();
 
         // Draw the trains
         MareysTrain.drawTrains(this);
+
+        // Draw the axis on top in order to be alwas visible
+        this.axis.drawAxis();
 
         // Draw the conflicts
         //this.conflictModule.draw();

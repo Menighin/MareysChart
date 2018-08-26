@@ -71,48 +71,26 @@ class MareysAxis {
         this.drawing.yFactor = (this.drawing.area.y2 - this.drawing.area.y1) / this.stations.last().dist;
     }
 
+    drawGrid() {
+        let ctx = this.chart.canvas.ctx;
 
-    draw() {
-        this._drawStations();
-        this._drawTime();
-    }
-
-    /**
-     * Draw the Y Axis, the stations
-     */
-    _drawStations() {
-        let canvas = this.chart.canvas;
-        let ctx = canvas.ctx;
-
-        ctx.font = STATION_FONTS;
         ctx.lineWidth = 1;
         ctx.strokeStyle = STROKE_COLOR;
 
+        // Draw horizontal lines
         ctx.beginPath();
         this.chart.data.stations.forEach(s => {
 
             let y = Math.round(Y_AXIS_TOP_MARGIN + s.dist * this.drawing.yFactor);
             
-            // Draw label
-            ctx.fillText(s.label, -this.chart.camera.translation.x / this.chart.camera.scale + 5, y);
-
             // Draw the horizontal lines for station
             ctx.moveTo(this.drawing.area.x1, y - 3);
             ctx.lineTo(this.drawing.area.x2, y - 3);
         });
-
         ctx.stroke();
-    }
 
-    /**
-     * Draw the X Axis, the time axis
-     */
-    _drawTime() {
-        let ctx = this.chart.canvas.ctx;
-
+        // Draw vertical lines
         let startDate = this.timeWindow.start;
-
-        ctx.font = STATION_FONTS;
 
         let lines = [];
         let highlightLines = [];
@@ -140,13 +118,6 @@ class MareysAxis {
                 });
             }
 
-            // Draw labels
-            if (i > 0 && i % 60 == 0) {
-                let label = startDate.toMareysAxisString();
-                let labelWidth = ctx.measureText(label).width;
-                ctx.fillText(label, x - labelWidth / 2, this.drawing.area.y2 + X_AXIS_MARGIN_TOP);
-            }
-
             startDate = startDate.addMinutes(1);
         }
 
@@ -169,7 +140,59 @@ class MareysAxis {
             ctx.lineTo(l.x2, l.y2);
         });
         ctx.stroke();
+    }
 
+    drawAxis() {
+        this._drawStations();
+        this._drawTime();
+    }
+
+    /**
+     * Draw the Y Axis, the stations
+     */
+    _drawStations() {
+        let canvas = this.chart.canvas;
+        let ctx = canvas.ctx;
+
+        ctx.font = STATION_FONTS;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = STROKE_COLOR;
+
+        ctx.beginPath();
+        this.chart.data.stations.forEach(s => {
+            let y = Math.round(Y_AXIS_TOP_MARGIN + s.dist * this.drawing.yFactor);
+            
+            // Draw label
+            ctx.fillText(s.label, -this.chart.camera.translation.x / this.chart.camera.scale + 5, y);
+        });
+
+        ctx.stroke();
+    }
+
+    /**
+     * Draw the X Axis, the time axis
+     */
+    _drawTime() {
+        let ctx = this.chart.canvas.ctx;
+
+        let startDate = this.timeWindow.start;
+
+        ctx.font = STATION_FONTS;
+
+        // Generating lines & drawing labels
+        for (let i = 0; i <= this.timeWindow.totalMinutes; i++) {
+
+            let x = Math.round(this.drawing.area.x1 + i * this.drawing.xFactor);
+
+            // Draw labels
+            if (i > 0 && i % 60 == 0) {
+                let label = startDate.toMareysAxisString();
+                let labelWidth = ctx.measureText(label).width;
+                ctx.fillText(label, x - labelWidth / 2, this.drawing.area.y2 + X_AXIS_MARGIN_TOP);
+            }
+
+            startDate = startDate.addMinutes(1);
+        }
     }
     
     /**
