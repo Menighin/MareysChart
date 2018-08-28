@@ -16,6 +16,7 @@ class InteractionModule {
         this.div = document.querySelector(`#${id}`);
         this.chart = chart;
         this.hammer = new Hammer(this.div);
+        this.hammer.add( new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 0 }) );
         this.drag = {};
         this.touch = {};
         this.mousePos = {};
@@ -137,6 +138,7 @@ class InteractionModule {
      * @param {Event} evt 
      */
     onDragStart(evt) {
+        console.log('startou');
         this.drag.initialTranslation = Object.assign({}, this.chart.camera.translation);
         this.drag.dragging = true;
         this.drag.elements = this.chart.selectionModule.getElementsAt(this.touch);
@@ -147,6 +149,7 @@ class InteractionModule {
      * @param {Event} evt 
      */
     onDrag(evt) {
+        console.log('arrastou');
         let pointer = this.getPointer(evt.center);
 
         // If the chart doesn't handle the drag event,

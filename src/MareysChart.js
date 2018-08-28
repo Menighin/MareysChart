@@ -123,7 +123,7 @@ class MareysChart {
         this.axis.drawAxis();
 
         // Draw the conflicts
-        //this.conflictModule.draw();
+        this.conflictModule.draw();
     } 
 
     /**
