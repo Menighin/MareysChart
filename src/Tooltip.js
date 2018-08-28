@@ -9,9 +9,14 @@ class Tooltip {
         this.hidden = false;
 
         // Creates the frame
-        this.frame = document.createElement('div');
+        this.frame = document.createElement('span');
         this.frame.style = `
             position: absolute;
+            -webkit-user-select: none;  
+            -moz-user-select: none;    
+            -ms-user-select: none;      
+            user-select: none;
+            background: lightgrey;
         `;
         chart.container.parentNode.appendChild(this.frame);
     }
@@ -73,16 +78,17 @@ class Tooltip {
         }
 
         if (isLeft) {
-            left = this.x - width;
+            left = this.x - width - 7;
         } else {
-            left = this.x;
+            left = this.x + 7;
         }
-
+        
         if (isTop) {
-            top = this.y - height;
+            top = this.y - height - 7;
         } else {
-            top = this.y;
+            top = this.y + 7;
         }
+        
         this.frame.style.left = left + "px";
         this.frame.style.top = top + "px";
         this.frame.style.visibility = "visible";
